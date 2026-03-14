@@ -343,6 +343,7 @@ export default async function ProjectsPage() {
                                     <td className="px-5 py-4 font-mono text-xs text-app-muted">
                                       {maskSecret(secret.value)}
                                     </td>
+
                                     <td className="px-5 py-4 text-xs text-app-muted">
                                       {dateFormatter.format(secret.createdAt)}
                                     </td>
@@ -428,6 +429,19 @@ export default async function ProjectsPage() {
                               </table>
                             </div>
                           )}
+                          <div className="mt-6">
+                            <h4 className="text-sm font-semibold text-app-foreground mb-4">Connect via CLI</h4>
+                            <div className="bg-black/20 p-4 font-mono text-sm text-app-foreground overflow-x-auto border border-white/5">
+                              <p className="mb-2 text-app-muted"># Windows (PowerShell)</p>
+                              <code className="block mb-4">curl.exe -sL bit.ly/krypt-cli | node - init</code>
+                              <p className="mb-2 text-app-muted"># Mac / Linux</p>
+                              <code className="block mb-4">curl -sL bit.ly/krypt-cli | node - init</code>
+                              <p className="border-t border-white/5 pt-4 text-xs text-app-muted italic">
+                                Replace 'init' with 'pull' after setting up krypt.json and your API Key.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                           </div>
                         </div>
                       </details>

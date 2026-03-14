@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  role         String     @default("user") // "user" or "admin"
+  projects     Project[]
+  auditLogs    AuditLog[]
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  environments Environment[]
+  auditLogs    AuditLog[]
+
+  @@index([ownerId])
+}
+
+model Environment {
+  id         String   @id @default(cuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  secrets    Secret[]
+  apiKeys    ApiKey[]
+
+  @@index([projectId])
+  @@unique([projectId, name])
+}
+
+model Secret {
+  id            String      @id @default(cuid())
+  key           String
+  value         String
+  description   String?
+  createdAt     DateTime    @default(now())
+  environmentId String
+  environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+
+  @@index([environmentId])
+  @@unique([environmentId, key])
+}
+
+model ApiKey {
+  id            String      @id @default(cuid())
+  key           String      @unique
+  name          String
+  createdAt     DateTime    @default(now())
+  lastUsedAt    DateTime?
+  environmentId String
+  environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+
+  @@index([environmentId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  actor      String
+  targetType String
+  targetName String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([createdAt])
+}

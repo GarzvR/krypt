@@ -3,25 +3,175 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --app-background: #07111f;
+    --app-background-soft: #0c1b2f;
+    --app-foreground: #edf5ff;
+    --app-muted: #8ba0bb;
+    --app-border: rgba(167, 203, 255, 0.18);
+    --app-surface: rgba(10, 24, 43, 0.72);
+    --app-surface-strong: rgba(8, 18, 33, 0.88);
+    --app-primary: #65e0c7;
+    --app-primary-strong: #1db7a1;
+    --app-primary-foreground: #031511;
+    --app-accent: #7ab6ff;
+    --app-danger-soft: rgba(255, 108, 132, 0.16);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+    border-color: var(--app-border);
+}
+
+html {
+    color-scheme: dark;
+    overflow-x: hidden;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--app-foreground);
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(104, 175, 255, 0.28),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 85% 18%,
+            rgba(101, 224, 199, 0.24),
+            transparent 22%
+        ),
+        radial-gradient(
+            circle at bottom,
+            rgba(43, 74, 126, 0.28),
+            transparent 30%
+        ),
+        linear-gradient(160deg, #07111f 0%, #0a1627 44%, #050b15 100%);
+    font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease,
+        opacity 180ms ease;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .bg-app {
+        background-color: var(--app-background);
+    }
+
+    .text-app-foreground {
+        color: var(--app-foreground);
+    }
+
+    .text-app-muted {
+        color: var(--app-muted);
+    }
+
+    .border-app {
+        border-color: var(--app-border);
+    }
+
+    .bg-app-surface {
+        background-color: var(--app-surface);
+    }
+
+    .bg-app-surface-strong {
+        background-color: var(--app-surface-strong);
+    }
+
+    .bg-app-primary {
+        background-color: var(--app-primary);
+    }
+
+    .text-app-primary-foreground {
+        color: var(--app-primary-foreground);
+    }
+
+    .text-app-accent {
+        color: var(--app-accent);
+    }
+
+    .ring-app-primary {
+        --tw-ring-color: rgba(101, 224, 199, 0.42);
+    }
+
+    .glass-panel {
+        background: linear-gradient(
+            180deg,
+            rgba(18, 38, 64, 0.82),
+            rgba(7, 18, 33, 0.72)
+        );
+        border: 1px solid var(--app-border);
+        box-shadow:
+            0 24px 80px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(20px);
+    }
+
+    .glass-panel-strong {
+        background: linear-gradient(
+            180deg,
+            rgba(11, 27, 48, 0.92),
+            rgba(6, 16, 30, 0.9)
+        );
+        border: 1px solid rgba(167, 203, 255, 0.2);
+        box-shadow:
+            0 28px 90px rgba(0, 0, 0, 0.32),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(24px);
+    }
+
+    .overlay-grid {
+        background-image:
+            linear-gradient(rgba(130, 167, 218, 0.07) 1px, transparent 1px),
+            linear-gradient(
+                90deg,
+                rgba(130, 167, 218, 0.07) 1px,
+                transparent 1px
+            );
+        background-size: 32px 32px;
+    }
+
+    .bg-app-primary-gradient {
+        background-image: linear-gradient(
+            135deg,
+            var(--app-primary),
+            var(--app-accent)
+        );
+    }
+
+    .text-app-gradient {
+        background-image: linear-gradient(
+            135deg,
+            #f7fbff,
+            #79e0cb 48%,
+            #86b9ff
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
 }

@@ -2,7 +2,7 @@ import { LandingPage } from "@/components/landing-page";
 import { getSessionUserId } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
-export default async function Home() {
+export default async function LandingRoutePage() {
   const sessionUserId = getSessionUserId();
 
   const user = sessionUserId

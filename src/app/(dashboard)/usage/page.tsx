@@ -80,11 +80,7 @@ export default async function UsagePage() {
       : Math.round((activeEnvironments / environmentCount) * 100);
   const burnState =
     usagePercent >= 85 ? "High" : usagePercent >= 60 ? "Moderate" : "Low";
-  const usageNotes = [
-    `${remainingCapacity} secret slot${remainingCapacity === 1 ? "" : "s"} remaining on ${currentPlan.name}.`,
-    `${emptyEnvironments} environment${emptyEnvironments === 1 ? "" : "s"} still have no secrets.`,
-    `${secretsAddedThisWeek} secret${secretsAddedThisWeek === 1 ? "" : "s"} added in the last 7 days.`,
-  ];
+
 
   return (
     <section className="space-y-8">

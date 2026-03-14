@@ -6,7 +6,7 @@ import {
   ArrowSquareOut,
   ChartBar,
   ClockCounterClockwise,
-  GearSix,
+
   House,
   SquaresFour,
 } from "@phosphor-icons/react";

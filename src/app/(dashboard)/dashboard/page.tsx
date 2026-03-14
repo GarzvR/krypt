@@ -77,12 +77,12 @@ export default async function DashboardPage() {
     ]);
 
   const stats = [
-    { label: "Projects", value: projectCount.toString().padStart(2, "0") },
+    { label: "Projects", value: projectCount.toString() },
     {
       label: "Environments",
-      value: environmentCount.toString().padStart(2, "0"),
+      value: environmentCount.toString(),
     },
-    { label: "Secrets", value: secretCount.toString().padStart(2, "0") },
+    { label: "Secrets", value: secretCount.toString() },
   ];
 
   const readyProjects = projects.filter((project) => {

@@ -104,7 +104,7 @@ export default async function UsagePage() {
           >
             <p className="text-sm text-app-muted">{item.label}</p>
             <p className="mt-4 text-5xl font-semibold tracking-tight text-app-foreground">
-              {String(item.value).padStart(2, "0")}
+              {item.value}
             </p>
           </article>
         ))}

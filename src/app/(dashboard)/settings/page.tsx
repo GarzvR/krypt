@@ -2,8 +2,11 @@ import { redirect } from "next/navigation";
 import { getSessionUserId } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
+import { getCurrentPlan } from "@/lib/plans";
+
 function resolvePlan() {
-  return { name: "Free Tier", capacity: 1000, seats: 1 };
+  const plan = getCurrentPlan();
+  return { name: "Free Tier", capacity: plan.secretLimit, seats: 1 };
 }
 
 export default async function SettingsPage() {

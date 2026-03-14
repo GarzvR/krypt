@@ -54,7 +54,7 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
           className="flex items-center justify-between border-b border-app/50 py-5"
         >
           <div className="flex items-center gap-10">
-            <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-app-foreground to-app-muted">
+            <p className="text-xl font-bold text-white">
               Krypt
             </p>
 

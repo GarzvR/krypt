@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signInAction } from "@/actions/auth";
+import { PasswordInput } from "@/components/auth/password-input";
 
 type SignInPageProps = {
   searchParams?: {
@@ -16,10 +17,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
       <h2 className="mt-3 text-3xl font-semibold tracking-tight text-app-foreground sm:text-4xl">
         Sign in
       </h2>
-      <p className="mt-3 text-sm leading-7 text-app-muted">
-        Continue to your projects, environments, usage, and encrypted secret
-        workspace.
-      </p>
+
 
       {error ? (
         <p className="mt-5 border border-rose-400/25 bg-rose-400/10 px-4 py-3 text-sm text-rose-300">
@@ -42,20 +40,13 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
           />
         </label>
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-app-foreground">
-            Password
-          </span>
-          <input
-            type="password"
-            name="password"
-            required
-            minLength={8}
-            autoComplete="current-password"
-            className="h-12 w-full border border-app bg-transparent px-4 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
-            placeholder="Your password"
-          />
-        </label>
+        <PasswordInput
+          name="password"
+          required
+          minLength={8}
+          autoComplete="current-password"
+          placeholder="Your password"
+        />
 
         <button
           type="submit"

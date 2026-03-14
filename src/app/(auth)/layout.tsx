@@ -10,9 +10,7 @@ export default function AuthLayout({
         <section className="glass-panel-strong w-full px-6 py-7 sm:px-8 sm:py-8">
           <div className="border-b border-app pb-5">
             <p className="text-base font-semibold text-app-foreground">Krypt</p>
-            <p className="mt-2 text-sm text-app-muted">
-              Secure workspace access
-            </p>
+
           </div>
           <div className="pt-6">{children}</div>
         </section>

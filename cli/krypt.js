@@ -7,7 +7,7 @@ const path = require("path");
 
 const args = process.argv.slice(2);
 const CONFIG_FILE = "krypt.json";
-const DEFAULT_API_URL = "http://localhost:3000/api/v1/pull";
+const DEFAULT_API_URL = "https://krypt-zeta-eight.vercel.app/api/v1/pull";
 
 function showHelp() {
   console.log(`

@@ -142,7 +142,7 @@ export default async function ProjectsPage() {
                 className="group border border-app bg-white/[0.03]"
                 open={index === 0}
               >
-                <summary className="cursor-pointer list-none border-b border-app px-5 py-5 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between border-b border-app px-5 py-5 marker:content-[''] [&::-webkit-details-marker]:hidden">
                   <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                     <div>
                       <h2 className="text-2xl font-semibold tracking-tight text-app-foreground">
@@ -245,7 +245,7 @@ export default async function ProjectsPage() {
                   ) : (
                     sortedEnvironments.map((environment) => (
                       <details key={environment.id} className="group overflow-hidden border border-app bg-black/10" open>
-                        <summary className="cursor-pointer border-b border-app bg-white/[0.03] px-5 py-4 transition-colors hover:bg-white/[0.05]">
+                        <summary className="flex cursor-pointer items-center justify-between border-b border-app bg-white/[0.03] px-5 py-4 transition-colors hover:bg-white/[0.05] marker:content-[''] [&::-webkit-details-marker]:hidden">
                           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                             <div className="flex items-center gap-4">
                               <div className="flex h-8 w-8 items-center justify-center border border-app bg-black/20 text-app-foreground">

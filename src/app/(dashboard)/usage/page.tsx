@@ -117,7 +117,7 @@ export default async function UsagePage() {
               Secret limit usage
             </p>
           </div>
-          <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="grid gap-0">
             <div className="px-5 py-5">
               <div className="flex items-end justify-between gap-4">
                 <div>
@@ -157,21 +157,7 @@ export default async function UsagePage() {
                 </div>
               </div>
             </div>
-            <div className="border-t border-app px-5 py-5 xl:border-l xl:border-t-0">
-              <p className="text-sm font-semibold text-app-foreground">
-                What this means
-              </p>
-              <div className="mt-4 space-y-3">
-                {usageNotes.map((item) => (
-                  <div
-                    key={item}
-                    className="border border-app bg-white/[0.03] px-4 py-3 text-sm text-app-muted"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+
           </div>
         </section>
 

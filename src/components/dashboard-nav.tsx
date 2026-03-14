@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { href: "/projects", label: "Projects", icon: SquaresFour },
   { href: "/audit-logs", label: "Audit Logs", icon: ClockCounterClockwise },
   { href: "/usage", label: "Usage", icon: ChartBar },
-  { href: "/settings", label: "Settings", icon: GearSix },
+
 ];
 
 function isActive(pathname: string, href: string) {

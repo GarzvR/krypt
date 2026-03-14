@@ -225,13 +225,7 @@ export default async function DashboardPage() {
               <span>Review workspace usage</span>
               <span className="text-app-muted">Open</span>
             </Link>
-            <Link
-              href="/settings"
-              className="flex items-center justify-between border border-app px-4 py-4 text-sm text-app-foreground hover:bg-white/[0.04]"
-            >
-              <span>Open workspace settings</span>
-              <span className="text-app-muted">Open</span>
-            </Link>
+
           </div>
         </section>
       </div>

@@ -3,6 +3,8 @@ import { decryptSecretValue } from "@/lib/security/secrets";
 import { logAudit } from "@/lib/audit";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");

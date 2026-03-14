@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { parseCredentials } from "@/lib/validations/auth";
+import { isRedirectError } from "next/dist/client/components/redirect";
 
 function withError(path: "/sign-in" | "/sign-up", message: string) {
   const params = new URLSearchParams({ error: message });
@@ -30,15 +31,22 @@ export async function signUpAction(formData: FormData) {
     redirect(withError("/sign-up", "An account with this email already exists."));
   }
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      passwordHash: await hashPassword(password),
-    },
-    select: { id: true },
-  });
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash: await hashPassword(password),
+      },
+      select: { id: true },
+    });
 
-  createSession(user.id);
+    createSession(user.id);
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    console.error("Sign up error:", error);
+    redirect(withError("/sign-up", "An unexpected error occurred during sign up. Please try again."));
+  }
+  
   redirect("/dashboard");
 }
 
@@ -52,22 +60,29 @@ export async function signInAction(formData: FormData) {
 
   const { email, password } = parsed.data;
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true, passwordHash: true },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, passwordHash: true },
+    });
 
-  if (!user) {
-    redirect(withError("/sign-in", "Invalid email or password."));
+    if (!user) {
+      redirect(withError("/sign-in", "Invalid email or password."));
+    }
+
+    const passwordMatches = await verifyPassword(password, user.passwordHash);
+
+    if (!passwordMatches) {
+      redirect(withError("/sign-in", "Invalid email or password."));
+    }
+
+    createSession(user.id);
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    console.error("Sign in error:", error);
+    redirect(withError("/sign-in", "An unexpected error occurred during sign in."));
   }
-
-  const passwordMatches = await verifyPassword(password, user.passwordHash);
-
-  if (!passwordMatches) {
-    redirect(withError("/sign-in", "Invalid email or password."));
-  }
-
-  createSession(user.id);
+  
   redirect("/dashboard");
 }
 

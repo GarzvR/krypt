@@ -8,6 +8,8 @@ import { getCurrentPlan, getSecretUsage } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {

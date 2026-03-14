@@ -2,6 +2,9 @@
   "name": "krypt",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "krypt-cli": "./cli/krypt.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

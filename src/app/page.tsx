@@ -2,6 +2,8 @@ import { LandingPage } from "@/components/landing-page";
 import { getSessionUserId } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const sessionUserId = getSessionUserId();
 

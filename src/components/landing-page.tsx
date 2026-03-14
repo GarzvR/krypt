@@ -59,10 +59,10 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
             </p>
 
             <nav className="hidden items-center gap-8 md:flex">
-              <a href="#home" className="text-sm font-medium text-app-muted hover:text-app-foreground transition-colors duration-200">
+              <a href="#home" className="text-sm font-medium text-white hover:text-app-primary transition-colors duration-200">
                 Home
               </a>
-              <a href="#features" className="text-sm font-medium text-app-muted hover:text-app-foreground transition-colors duration-200">
+              <a href="#features" className="text-sm font-medium text-white hover:text-app-primary transition-colors duration-200">
                 Features
               </a>
             </nav>
@@ -145,138 +145,24 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
             </motion.div>
           </motion.div>
 
-          {/* Interactive Mockup */}
+          {/* Visual Mockup */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative mt-20"
+            className="relative mt-20 flex justify-center"
           >
             <div className="absolute inset-x-8 -top-10 h-40 bg-[radial-gradient(circle,_rgba(101,224,199,0.2),_transparent_60%)] blur-3xl" />
             <motion.div
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
-              className="relative overflow-hidden border border-app/40 bg-[#06101d]/90 p-1 shadow-[0_40px_100px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+              className="relative overflow-hidden border border-app/40 bg-[#06101d]/90 p-1 shadow-[0_40px_100px_rgba(0,0,0,0.4)] backdrop-blur-xl max-w-5xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
-              <div className="border border-app/30 bg-[#081323] overflow-hidden">
-                <div className="grid gap-0 lg:grid-cols-[240px_minmax(0,1fr)]">
-                  <div className="border-b border-app/30 lg:border-b-0 lg:border-r bg-white/[0.01]">
-                    <div className="flex items-center gap-3 border-b border-app/30 p-5">
-                      <span className="flex h-10 w-10 items-center justify-center border border-app/50 bg-gradient-to-br from-app-primary/20 to-transparent text-sm font-semibold text-app-primary">
-                        U
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-app-foreground">
-                          User session
-                        </p>
-                        <p className="text-xs text-app-muted">
-                          Protected workspace
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="border-b border-app/30 p-5">
-                      <div className="flex items-center justify-between border border-app/30 bg-black/20 px-3 py-2">
-                        <p className="text-sm text-app-muted">Search...</p>
-                        <p className="text-xs text-app-muted bg-white/5 px-1.5">Cmd K</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 p-3">
-                      {["Home", "Projects", "Usage", "Settings"].map(
-                        (item, index) => (
-                          <div
-                            key={item}
-                            className={`px-3 py-2 text-sm font-medium transition-colors ${
-                              index === 1
-                                ? "bg-white/10 text-app-foreground border-l-2 border-app-primary"
-                                : "text-app-muted hover:bg-white/5 hover:text-app-foreground"
-                            }`}
-                          >
-                            {item}
-                          </div>
-                        ),
-                      )}
-                    </div>
-
-                    <div className="mt-12 border-t border-app/30 p-5">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-app-foreground">
-                          Usage limit
-                        </p>
-                        <p className="text-sm font-semibold text-app-primary">
-                          24%
-                        </p>
-                      </div>
-                      <div className="mt-3 h-1.5 overflow-hidden bg-white/10">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: "24%" }}
-                          transition={{ duration: 1.5, delay: 1 }}
-                          className="h-full bg-app-primary shadow-[0_0_10px_rgba(101,224,199,0.8)]"
-                        />
-                      </div>
-                      <p className="mt-2 text-xs text-app-muted">
-                        24 / 100 secrets
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="flex justify-between items-center pb-6 border-b border-app/30">
-                      <h2 className="text-xl font-semibold text-app-foreground">Projects</h2>
-                      <span className="inline-flex h-9 items-center border border-app/30 bg-app-primary/10 px-4 text-sm font-medium text-app-primary transition-colors hover:bg-app-primary/20 cursor-pointer">
-                         + New Project
-                      </span>
-                    </div>
-
-                    <div className="grid gap-4 mt-6 md:grid-cols-3">
-                      {[
-                        { label: "Projects", val: "03", active: true },
-                        { label: "Environments", val: "09" },
-                        { label: "Secrets", val: "24" }
-                      ].map((stat) => (
-                        <div
-                          key={stat.label}
-                          className={`border p-5 ${stat.active ? 'border-app-primary/30 bg-app-primary/5' : 'border-app/30 bg-white/[0.02]'}`}
-                        >
-                          <p className="text-sm text-app-muted">{stat.label}</p>
-                          <p className={`mt-2 text-3xl font-bold tracking-tight ${stat.active ? 'text-app-primary' : 'text-app-foreground'}`}>
-                            {stat.val}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-6 border border-app/30 bg-white/[0.01] overflow-hidden">
-                      <div className="flex items-center justify-between border-b border-app/30 bg-white/[0.02] px-5 py-3">
-                        <p className="text-sm font-medium text-app-foreground">Recent Projects</p>
-                      </div>
-                      <div className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors border-b border-app/10 last:border-0 cursor-pointer">
-                         <div className="flex items-center gap-3">
-                           <div className="h-8 w-8 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-xs text-app-foreground">API</div>
-                           <div>
-                             <p className="text-sm font-medium text-app-foreground">Production API</p>
-                             <p className="text-xs text-app-muted">Updated 2 mins ago</p>
-                           </div>
-                         </div>
-                         <div className="px-2 py-1 bg-green-500/10 text-green-400 text-xs border border-green-500/20 uppercase tracking-wider">Active</div>
-                      </div>
-                      <div className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors cursor-pointer">
-                         <div className="flex items-center gap-3">
-                           <div className="h-8 w-8 bg-gradient-to-br from-orange-500/20 to-pink-500/20 border border-white/10 flex items-center justify-center text-xs text-app-foreground">WEB</div>
-                           <div>
-                             <p className="text-sm font-medium text-app-foreground">Marketing Web</p>
-                             <p className="text-xs text-app-muted">Updated 5 hrs ago</p>
-                           </div>
-                         </div>
-                         <div className="px-2 py-1 bg-green-500/10 text-green-400 text-xs border border-green-500/20 uppercase tracking-wider">Active</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <img 
+                src="/assets/Mockup.png" 
+                alt="Krypt Dashboard Mockup" 
+                className="w-full h-auto block"
+              />
             </motion.div>
           </motion.div>
         </section>
@@ -330,10 +216,6 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
         <footer className="border-t border-app/30 py-10 mt-10">
            <div className="flex justify-between items-center text-sm text-app-muted">
              <p>© 2026 Krypt. All rights reserved.</p>
-             <div className="flex gap-6">
-               <a href="#" className="hover:text-app-foreground transition-colors">Twitter</a>
-               <a href="#" className="hover:text-app-foreground transition-colors">GitHub</a>
-             </div>
            </div>
         </footer>
       </div>

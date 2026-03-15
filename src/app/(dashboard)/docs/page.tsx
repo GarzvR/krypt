@@ -152,15 +152,16 @@ export default function DocsPage() {
 
           <div className="space-y-8">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-app-primary mb-4">Official One-liner</p>
-              <CodeBlock id="curl-pub" code="curl -sL https://krypt.sh/api/raw/cli | node - init" label="Universal / Public" />
-              <p className="mt-4 text-[10px] text-app-muted italic">
-                Note: Replace <code>krypt.sh</code> with your actual deployed domain.
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-app-primary mb-4">Official One-liner (Public)</p>
+              <CodeBlock id="curl-pub" code="curl -sL https://raw.githubusercontent.com/GarzvR/krypt/main/cli/krypt.js | node - init" label="Universal / Public" />
+              <p className="mt-4 text-[10px] text-app-muted italic leading-relaxed">
+                This one-liner fetches the CLI directly from your GitHub repository. 
+                Perfect for external users and automated CI/CD pipelines.
               </p>
             </div>
             
             <div className="p-4 bg-emerald-400/5 border border-emerald-400/20 rounded text-xs text-emerald-400/80 leading-relaxed text-center">
-              Once Published to NPM: <code className="text-white ml-2">npx krypt-cli init</code>
+              Published Method: <code className="text-white ml-2">npx krypt-cli init</code>
             </div>
           </div>
         </motion.section>

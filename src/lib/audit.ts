@@ -6,7 +6,7 @@ interface AuditLogInput {
   actor: string;
   targetType: "Project" | "Environment" | "Secret" | "ApiKey";
   targetName: string;
-  projectId: string;
+  projectId?: string;
   userId?: string;
   metadata?: Record<string, unknown>;
 }
@@ -23,8 +23,8 @@ export function logAudit(input: AuditLogInput) {
         actor: input.actor,
         targetType: input.targetType,
         targetName: input.targetName,
-        projectId: input.projectId,
-        userId: input.userId ?? null,
+        projectId: input.projectId ?? undefined,
+        userId: input.userId ?? undefined,
         metadata: (input.metadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
       },
     })

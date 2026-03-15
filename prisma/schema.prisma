@@ -16,6 +16,7 @@ model User {
   role         String     @default("user") // "user" or "admin"
   projects     Project[]
   auditLogs    AuditLog[]
+  apiKeys      ApiKey[]
 }
 
 model Project {
@@ -62,12 +63,15 @@ model Secret {
 model ApiKey {
   id            String      @id @default(cuid())
   key           String      @unique
-  name          String
+  name          String?
   createdAt     DateTime    @default(now())
   lastUsedAt    DateTime?
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   environmentId String
   environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@index([environmentId])
 }
 
@@ -79,8 +83,8 @@ model AuditLog {
   targetName String
   metadata   Json?
   createdAt  DateTime @default(now())
-  projectId  String
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId     String?
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
+import Image from "next/image";
 
 type LandingPageProps = {
   currentUserEmail?: string | null;
@@ -65,6 +66,9 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
               <a href="#features" className="text-sm font-medium text-white hover:text-app-primary transition-colors duration-200">
                 Features
               </a>
+              <Link href="/docs" className="text-sm font-medium text-white hover:text-app-primary transition-colors duration-200">
+                Docs
+              </Link>
             </nav>
           </div>
 
@@ -158,10 +162,13 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
               transition={{ duration: 0.3 }}
               className="relative overflow-hidden border border-app/40 bg-[#06101d]/90 p-1 shadow-[0_40px_100px_rgba(0,0,0,0.4)] backdrop-blur-xl max-w-5xl"
             >
-              <img 
+              <Image 
                 src="/assets/Mockup.png" 
                 alt="Krypt Dashboard Mockup" 
+                width={1024}
+                height={600}
                 className="w-full h-auto block"
+                priority
               />
             </motion.div>
           </motion.div>
@@ -214,8 +221,11 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
 
         {/* Footer */}
         <footer className="border-t border-app/30 py-10 mt-10">
-           <div className="flex justify-between items-center text-sm text-app-muted">
+            <div className="flex justify-between items-center text-sm text-app-muted">
              <p>© 2026 Krypt. All rights reserved.</p>
+             <div className="flex gap-6">
+                <Link href="/docs" className="hover:text-app-primary transition-colors">Documentation</Link>
+             </div>
            </div>
         </footer>
       </div>

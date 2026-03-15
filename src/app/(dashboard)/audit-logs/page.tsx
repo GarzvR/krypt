@@ -26,9 +26,10 @@ export default async function AuditLogsPage() {
 
   const logs = await prisma.auditLog.findMany({
     where: {
-      project: {
-        ownerId: sessionUserId,
-      },
+      OR: [
+        { userId: sessionUserId },
+        { project: { ownerId: sessionUserId } },
+      ],
     },
     orderBy: { createdAt: "desc" },
     take: 50,
@@ -103,7 +104,7 @@ export default async function AuditLogsPage() {
                         {log.targetName}
                       </td>
                       <td className="whitespace-nowrap px-5 py-4 text-xs text-app-muted">
-                        {log.project.name}
+                        {log.project?.name ?? "Global / Account"}
                       </td>
                     </tr>
                   );

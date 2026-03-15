@@ -9,6 +9,8 @@ import {
 
   House,
   SquaresFour,
+  BookOpen,
+  UserCircle as UserCircleIcon,
 } from "@phosphor-icons/react";
 
 const NAV_ITEMS = [
@@ -16,7 +18,7 @@ const NAV_ITEMS = [
   { href: "/projects", label: "Projects", icon: SquaresFour },
   { href: "/audit-logs", label: "Audit Logs", icon: ClockCounterClockwise },
   { href: "/usage", label: "Usage", icon: ChartBar },
-
+  { href: "/docs", label: "Documentation", icon: BookOpen },
 ];
 
 function isActive(pathname: string, href: string) {

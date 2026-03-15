@@ -386,6 +386,7 @@ export async function createApiKey(formData: FormData) {
     return;
   }
 
+  // Verify ownership of the environment
   const environment = await prisma.environment.findFirst({
     where: {
       id: environmentId,
@@ -393,7 +394,7 @@ export async function createApiKey(formData: FormData) {
         ownerId: sessionUserId,
       },
     },
-    select: { id: true, projectId: true },
+    select: { id: true },
   });
 
   if (!environment) {
@@ -404,6 +405,7 @@ export async function createApiKey(formData: FormData) {
 
   await prisma.apiKey.create({
     data: {
+      userId: sessionUserId,
       environmentId,
       name,
       key: token,
@@ -415,7 +417,6 @@ export async function createApiKey(formData: FormData) {
     actor: await getActorEmail(sessionUserId),
     targetType: "ApiKey",
     targetName: name,
-    projectId: environment.projectId,
     userId: sessionUserId,
   });
 
@@ -434,13 +435,9 @@ export async function deleteApiKey(formData: FormData) {
   const apiKey = await prisma.apiKey.findFirst({
     where: {
       id: apiKeyId,
-      environment: {
-        project: {
-          ownerId: sessionUserId,
-        },
-      },
+      userId: sessionUserId,
     },
-    select: { id: true, name: true, environment: { select: { projectId: true } } },
+    select: { id: true, name: true },
   });
 
   if (!apiKey) {
@@ -451,8 +448,7 @@ export async function deleteApiKey(formData: FormData) {
     action: "APIKEY_REVOKED",
     actor: await getActorEmail(sessionUserId),
     targetType: "ApiKey",
-    targetName: apiKey.name,
-    projectId: apiKey.environment.projectId,
+    targetName: apiKey.name ?? "unnamed",
     userId: sessionUserId,
   });
 
@@ -463,3 +459,4 @@ export async function deleteApiKey(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/projects");
 }
+

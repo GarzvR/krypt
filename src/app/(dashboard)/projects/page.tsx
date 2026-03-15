@@ -2,15 +2,17 @@ import Link from "next/link";
 import { CaretDown } from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import {
+  createApiKey,
   createEnvironment,
   createProject,
   createSecret,
+  deleteApiKey,
   deleteEnvironment,
   deleteProject,
   deleteSecret,
-  createApiKey,
-  deleteApiKey,
 } from "@/actions/projects";
+import { CopyButton } from "@/components/copy-button";
+import { Command } from "@phosphor-icons/react/dist/ssr";
 import { getSessionUserId } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 
@@ -284,142 +286,76 @@ export default async function ProjectsPage() {
                           </div>
                         </summary>
 
-                        <div>
-
-                        <form
-                          action={createSecret}
-                          className="grid gap-3 border-b border-app p-5 xl:grid-cols-[1.2fr_1.2fr_1fr_auto]"
-                        >
-                          <input type="hidden" name="environmentId" value={environment.id} />
-                          <input
-                            type="text"
-                            name="key"
-                            required
-                            placeholder="API_KEY"
-                            className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
-                          />
-                          <input
-                            type="text"
-                            name="value"
-                            required
-                            placeholder="Secret value"
-                            className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
-                          />
-                          <input
-                            type="text"
-                            name="description"
-                            placeholder="Description"
-                            className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
-                          />
-                          <button
-                            type="submit"
-                            className="h-11 border border-app bg-app-primary px-4 text-sm font-semibold text-app-primary-foreground transition hover:opacity-90"
+                        <div className="p-5">
+                          <form
+                            action={createSecret}
+                            className="grid gap-3 border-b border-app pb-5 xl:grid-cols-[1.2fr_1.2fr_1fr_auto]"
                           >
-                            Add secret
-                          </button>
-                        </form>
-
-                        {environment.secrets.length === 0 ? (
-                          <p className="px-5 py-5 text-sm text-app-muted">
-                            No secrets in this environment.
-                          </p>
-                        ) : (
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full text-left text-sm">
-                              <thead className="border-b border-app">
-                                <tr>
-                                  <th className="px-5 py-4 font-semibold text-app-foreground">Key</th>
-                                  <th className="px-5 py-4 font-semibold text-app-foreground">Value</th>
-                                  <th className="px-5 py-4 font-semibold text-app-foreground">Created</th>
-                                  <th className="px-5 py-4 font-semibold text-app-foreground">Action</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-white/10">
-                                {environment.secrets.map((secret) => (
-                                  <tr key={secret.id}>
-                                    <td className="px-5 py-4 font-mono text-xs text-app-foreground">
-                                      {secret.key}
-                                    </td>
-                                    <td className="px-5 py-4 font-mono text-xs text-app-muted">
-                                      {maskSecret(secret.value)}
-                                    </td>
-
-                                    <td className="px-5 py-4 text-xs text-app-muted">
-                                      {dateFormatter.format(secret.createdAt)}
-                                    </td>
-                                    <td className="px-5 py-4">
-                                      <form action={deleteSecret}>
-                                        <input type="hidden" name="secretId" value={secret.id} />
-                                        <button
-                                          type="submit"
-                                          className="border border-rose-400/25 bg-rose-400/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-400/15"
-                                        >
-                                          Delete
-                                        </button>
-                                      </form>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                        
-                        <div className="border-t border-app p-5 bg-white/[0.01]">
-                          <div className="flex items-center justify-between mb-4">
-                            <h4 className="text-sm font-semibold text-app-foreground">API Keys</h4>
-                          </div>
-                          
-                          <form action={createApiKey} className="flex gap-3 mb-4">
                             <input type="hidden" name="environmentId" value={environment.id} />
                             <input
                               type="text"
-                              name="name"
+                              name="key"
                               required
-                              placeholder="Key Name (e.g. Vercel Production)"
-                              className="h-10 w-full max-w-sm border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
+                              placeholder="API_KEY"
+                              className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
+                            />
+                            <input
+                              type="text"
+                              name="value"
+                              required
+                              placeholder="Secret value"
+                              className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
+                            />
+                            <input
+                              type="text"
+                              name="description"
+                              placeholder="Description"
+                              className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
                             />
                             <button
                               type="submit"
-                              className="h-10 border border-app bg-white/[0.05] px-4 text-sm font-medium text-app-foreground transition hover:bg-white/[0.1]"
+                              className="h-11 border border-app bg-app-primary px-4 text-sm font-semibold text-app-primary-foreground transition hover:opacity-90"
                             >
-                              Generate Key
+                              Add secret
                             </button>
                           </form>
 
-                          {environment.apiKeys && environment.apiKeys.length === 0 ? (
-                            <p className="text-sm text-app-muted mt-2">No API keys generated.</p>
+                          {environment.secrets.length === 0 ? (
+                            <p className="py-5 text-sm text-app-muted">
+                              No secrets in this environment.
+                            </p>
                           ) : (
-                            <div className="overflow-x-auto mt-2 border border-app">
+                            <div className="overflow-x-auto">
                               <table className="min-w-full text-left text-sm">
-                                <thead className="border-b border-app bg-black/20">
+                                <thead className="border-b border-app">
                                   <tr>
-                                    <th className="px-5 py-3 font-semibold text-app-foreground">Name</th>
-                                    <th className="px-5 py-3 font-semibold text-app-foreground">Token</th>
-                                    <th className="px-5 py-3 font-semibold text-app-foreground">Last Used</th>
-                                    <th className="px-5 py-3 font-semibold text-app-foreground">Action</th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">Key</th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">Value</th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">Created</th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">Action</th>
                                   </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/10 bg-white/[0.01]">
-                                  {environment.apiKeys?.map((apiKey) => (
-                                    <tr key={apiKey.id}>
-                                      <td className="px-5 py-3 text-xs text-app-foreground font-medium">
-                                        {apiKey.name}
+                                <tbody className="divide-y divide-white/10">
+                                  {environment.secrets.map((secret) => (
+                                    <tr key={secret.id}>
+                                      <td className="px-5 py-4 font-mono text-xs text-app-foreground">
+                                        {secret.key}
                                       </td>
-                                      <td className="px-5 py-3 font-mono text-xs text-app-muted">
-                                        {apiKey.key}
+                                      <td className="px-5 py-4 font-mono text-xs text-app-muted">
+                                        {maskSecret(secret.value)}
                                       </td>
-                                      <td className="px-5 py-3 text-xs text-app-muted">
-                                        {apiKey.lastUsedAt ? dateFormatter.format(apiKey.lastUsedAt) : "Never"}
+
+                                      <td className="px-5 py-4 text-xs text-app-muted">
+                                        {dateFormatter.format(secret.createdAt)}
                                       </td>
-                                      <td className="px-5 py-3 flex gap-2">
-                                        <form action={deleteApiKey}>
-                                          <input type="hidden" name="apiKeyId" value={apiKey.id} />
+                                      <td className="px-5 py-4">
+                                        <form action={deleteSecret}>
+                                          <input type="hidden" name="secretId" value={secret.id} />
                                           <button
                                             type="submit"
-                                            className="px-3 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-400/10 border border-transparent transition-colors"
+                                            className="border border-rose-400/25 bg-rose-400/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-400/15"
                                           >
-                                            Revoke
+                                            Delete
                                           </button>
                                         </form>
                                       </td>
@@ -429,19 +365,73 @@ export default async function ProjectsPage() {
                               </table>
                             </div>
                           )}
-                          <div className="mt-6">
-                            <h4 className="text-sm font-semibold text-app-foreground mb-4">Connect via CLI</h4>
-                            <div className="bg-black/20 p-4 font-mono text-sm text-app-foreground overflow-x-auto border border-white/5">
-                              <p className="mb-2 text-app-muted"># Windows (PowerShell)</p>
-                              <code className="block mb-4">curl.exe -sL bit.ly/krypt-cli | node - init</code>
-                              <p className="mb-2 text-app-muted"># Mac / Linux</p>
-                              <code className="block mb-4">curl -sL bit.ly/krypt-cli | node - init</code>
-                              <p className="border-t border-white/5 pt-4 text-xs text-app-muted italic">
-                                Replace 'init' with 'pull' after setting up krypt.json and your API Key.
-                              </p>
+                          
+                          <div className="mt-8 grid gap-8 lg:grid-cols-2">
+                            {/* CLI Info */}
+                            <div className="border-t border-app pt-6">
+                              <h4 className="text-sm font-semibold text-app-foreground mb-4">Connect via CLI</h4>
+                              <div className="bg-black/20 p-4 font-mono text-sm text-app-foreground overflow-x-auto border border-white/5">
+                                <p className="mb-2 text-app-muted">Fetch secrets for this environment:</p>
+                                <code className="block mb-4 text-white">npx krypt-cli pull {environment.name}</code>
+                                <p className="border-t border-white/5 pt-4 text-xs text-app-muted italic">
+                                  Use the token generated on the right for authentication.
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </div>
+
+                            {/* API Keys */}
+                            <div className="border-t border-app pt-6">
+                              <h4 className="text-sm font-semibold text-app-foreground mb-4">API Tokens</h4>
+                              <div className="space-y-4">
+                                <form action={createApiKey} className="flex gap-2">
+                                  <input type="hidden" name="environmentId" value={environment.id} />
+                                  <input
+                                    type="text"
+                                    name="name"
+                                    required
+                                    placeholder="Token label (e.g. CI/CD)"
+                                    className="h-10 flex-1 border border-app bg-transparent px-3 text-xs text-app-foreground outline-none focus:ring-1 focus:ring-app-primary"
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="h-10 border border-app bg-app-primary px-4 text-xs font-bold text-app-primary-foreground hover:opacity-90 transition-opacity"
+                                  >
+                                    Generate
+                                  </button>
+                                </form>
+
+                                <div className="space-y-2">
+                                  {environment.apiKeys.length === 0 ? (
+                                    <p className="text-[10px] text-app-muted italic">No tokens active.</p>
+                                  ) : (
+                                    environment.apiKeys.map((key) => (
+                                      <div key={key.id} className="flex items-center justify-between border border-white/5 bg-white/[0.02] p-2 pr-1">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <Command size={14} className="text-app-muted shrink-0" />
+                                          <div className="min-w-0">
+                                            <p className="text-[10px] font-semibold text-white truncate">{key.name}</p>
+                                            <code className="text-[10px] text-app-muted font-mono">{key.key.substring(0, 6)}•••</code>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <CopyButton value={key.key} />
+                                          <form action={deleteApiKey}>
+                                            <input type="hidden" name="apiKeyId" value={key.id} />
+                                            <button
+                                              type="submit"
+                                              className="p-1.5 text-rose-400/40 hover:text-rose-400 transition-colors"
+                                              title="Revoke Token"
+                                            >
+                                              <CaretDown size={14} className="rotate-45" /> {/* Placeholder for a better 'X' if needed */}
+                                            </button>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </details>

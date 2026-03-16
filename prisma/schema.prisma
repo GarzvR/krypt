@@ -8,15 +8,21 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  passwordHash String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  role         String     @default("user") // "user" or "admin"
-  projects     Project[]
-  auditLogs    AuditLog[]
-  apiKeys      ApiKey[]
+  id                         String     @id @default(cuid())
+  email                      String     @unique
+  passwordHash               String
+  createdAt                  DateTime   @default(now())
+  updatedAt                  DateTime   @updatedAt
+  role                       String     @default("user") // "user" or "admin"
+  planId                     String     @default("starter")
+  lemonsqueezyCustomerId     String?    @unique
+  lemonsqueezySubscriptionId String?    @unique
+  lemonsqueezyOrderId        String?
+  lemonsqueezyVariantId      String?
+  subscriptionStatus         String?
+  projects                   Project[]
+  auditLogs                  AuditLog[]
+  apiKeys                    ApiKey[]
 }
 
 model Project {

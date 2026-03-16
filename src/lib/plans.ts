@@ -1,4 +1,4 @@
-export type PlanId = "starter" | "pro" | "team";
+export type PlanId = "starter" | "pro";
 
 export const PLAN_DEFINITIONS = {
   starter: {
@@ -6,33 +6,18 @@ export const PLAN_DEFINITIONS = {
     name: "Starter",
     price: "$0",
     monthlyPriceNote: "Free",
-    projectLimit: 999999,
-    secretLimit: 999999,
-    environmentLimit: 999999,
-    workspaceLimit: 1,
-    seatLimit: 1,
+    projectLimit: 1,
+    secretLimit: 50,
+    environmentLimit: 3,
   },
   pro: {
     id: "pro",
     name: "Pro",
-    price: "$9",
+    price: "$4.99",
     monthlyPriceNote: "per month",
     projectLimit: 10,
-    secretLimit: 1000,
-    environmentLimit: Number.POSITIVE_INFINITY,
-    workspaceLimit: 1,
-    seatLimit: 1,
-  },
-  team: {
-    id: "team",
-    name: "Team",
-    price: "$29",
-    monthlyPriceNote: "per month",
-    projectLimit: Number.POSITIVE_INFINITY,
-    secretLimit: 5000,
-    environmentLimit: Number.POSITIVE_INFINITY,
-    workspaceLimit: 1,
-    seatLimit: 20,
+    secretLimit: 300,
+    environmentLimit: 30,
   },
 } as const satisfies Record<
   PlanId,
@@ -44,21 +29,27 @@ export const PLAN_DEFINITIONS = {
     projectLimit: number;
     secretLimit: number;
     environmentLimit: number;
-    workspaceLimit: number;
-    seatLimit: number;
   }
 >;
 
-export function getCurrentPlan() {
-  return PLAN_DEFINITIONS.starter;
+export function resolvePlanId(planId?: string | null): PlanId {
+  return planId === "pro" ? "pro" : "starter";
 }
 
-export function getRecommendedPlan(secretCount: number) {
-  if (secretCount > PLAN_DEFINITIONS.pro.secretLimit) {
-    return PLAN_DEFINITIONS.team;
-  }
+export function getCurrentPlan(planId?: string | null) {
+  return PLAN_DEFINITIONS[resolvePlanId(planId)];
+}
 
-  if (secretCount > PLAN_DEFINITIONS.starter.secretLimit) {
+export function getRecommendedPlan(input: {
+  projectCount: number;
+  environmentCount: number;
+  secretCount: number;
+}) {
+  if (
+    input.projectCount > PLAN_DEFINITIONS.starter.projectLimit ||
+    input.environmentCount > PLAN_DEFINITIONS.starter.environmentLimit ||
+    input.secretCount > PLAN_DEFINITIONS.starter.secretLimit
+  ) {
     return PLAN_DEFINITIONS.pro;
   }
 
@@ -79,4 +70,8 @@ export function hasReachedLimit(currentCount: number, limit: number) {
   }
 
   return currentCount >= limit;
+}
+
+export function formatPlanLimit(limit: number) {
+  return Number.isFinite(limit) ? `${limit}` : "Unlimited";
 }

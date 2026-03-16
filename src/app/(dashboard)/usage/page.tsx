@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUserId } from "@/lib/auth/session";
 import {
+  formatPlanLimit,
   getCurrentPlan,
   getRecommendedPlan,
   getSecretUsage,
@@ -14,18 +16,24 @@ export default async function UsagePage() {
     redirect("/sign-in");
   }
 
-  const projects = await prisma.project.findMany({
-    where: { ownerId: sessionUserId },
-    include: {
-      environments: {
-        include: {
-          secrets: {
-            select: { id: true, createdAt: true },
+  const [user, projects] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: sessionUserId },
+      select: { planId: true },
+    }),
+    prisma.project.findMany({
+      where: { ownerId: sessionUserId },
+      include: {
+        environments: {
+          include: {
+            secrets: {
+              select: { id: true, createdAt: true },
+            },
           },
         },
       },
-    },
-  });
+    }),
+  ]);
 
   const projectCount = projects.length;
   const environmentCount = projects.reduce(
@@ -43,8 +51,12 @@ export default async function UsagePage() {
     0,
   );
 
-  const currentPlan = getCurrentPlan();
-  const recommendedPlan = getRecommendedPlan(secretCount);
+  const currentPlan = getCurrentPlan(user?.planId);
+  const recommendedPlan = getRecommendedPlan({
+    projectCount,
+    environmentCount,
+    secretCount,
+  });
   const usagePercent = getSecretUsage(secretCount, currentPlan.secretLimit);
   const emptyEnvironments = projects.reduce(
     (total, project) =>
@@ -80,7 +92,6 @@ export default async function UsagePage() {
       : Math.round((activeEnvironments / environmentCount) * 100);
   const burnState =
     usagePercent >= 85 ? "High" : usagePercent >= 60 ? "Moderate" : "Low";
-
 
   return (
     <section className="space-y-8">
@@ -153,21 +164,30 @@ export default async function UsagePage() {
                 </div>
               </div>
             </div>
-
           </div>
         </section>
 
         <section className="border border-app bg-white/[0.03]">
-          <div className="border-b border-app px-5 py-4">
+          <div className="flex items-center justify-between border-b border-app px-5 py-4">
             <p className="text-base font-semibold text-app-foreground">
               Plan metrics
             </p>
+            <Link
+              href="/api/billing/checkout"
+              className="inline-flex h-10 items-center border border-app bg-app-primary px-4 text-sm font-semibold text-app-primary-foreground hover:opacity-90"
+            >
+              Upgrade to Pro
+            </Link>
           </div>
           <div className="divide-y divide-white/10">
             {[
               ["Current plan", currentPlan.name],
-              ["Secret limit", `${currentPlan.secretLimit}`],
-              ["Project limit", `${currentPlan.projectLimit}`],
+              ["Secret limit", formatPlanLimit(currentPlan.secretLimit)],
+              [
+                "Environment limit",
+                formatPlanLimit(currentPlan.environmentLimit),
+              ],
+              ["Project limit", formatPlanLimit(currentPlan.projectLimit)],
               ["Remaining capacity", `${remainingCapacity}`],
               ["Recommended upgrade", recommendedPlan.name],
             ].map(([label, value]) => (

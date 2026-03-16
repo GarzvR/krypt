@@ -24,7 +24,7 @@ const SEARCH_ITEMS = [
   {
     href: "/settings",
     label: "Settings",
-    description: "Plan, billing, and security roadmap",
+    description: "Starter limits, Pro upgrade path, and security roadmap",
   },
   {
     href: "/landing",

@@ -1,271 +1,262 @@
 #!/usr/bin/env node
 
-const https = require("https");
-const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 
 const args = process.argv.slice(2);
 const CONFIG_FILE = "krypt.json";
-const BASE_URL = process.env.KRYPT_API_URL || "https://krypt-zeta-eight.vercel.app/api/v1";
+const DEFAULT_BASE_URL =
+  process.env.KRYPT_API_URL || "https://krypt-zeta-eight.vercel.app/api/v1";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function question(query) {
-  return new Promise(resolve => rl.question(query, resolve));
+function createPrompt() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 }
 
-function showHelp() {
+function askQuestion(prompt, rl) {
+  return new Promise((resolve) => rl.question(prompt, resolve));
+}
+
+function parseArgs(argv) {
+  const flags = {};
+  const positional = [];
+
+  for (const arg of argv) {
+    if (!arg.startsWith("--")) {
+      positional.push(arg);
+      continue;
+    }
+
+    const [key, value] = arg.slice(2).split("=", 2);
+    flags[key] = value ?? true;
+  }
+
+  return { flags, positional };
+}
+
+function printHelp() {
   console.log(`
-Krypt CLI - Secure Environment Variable Manager
+Krypt CLI
 
 Usage:
   krypt <command> [options]
 
 Commands:
-  init          Initialize a new krypt.json configuration file.
-  pull          Pull secrets from the Krypt API.
+  init                      Save your environment token.
+  info                      Show the project and environment bound to the token.
+  pull [environment-name]   Pull secrets for the token's environment.
 
-Options (pull):
-  [environment] Specific environment to pull (e.g., development, staging).
-  --all         Pull all environments in the project.
-  --token       Your Krypt API Key. Overrides the token in krypt.json.
-  --output      Target file to write secrets to. (Default: .env.[envName])
-  --reselect    Force re-selection of project.
+Options:
+  --token=<token>           Override token from krypt.json.
+  --output=<file>           Output file for pull. Defaults to .env.<environment>.
+  --api-url=<url>           Override API base URL.
+  --help                    Show this help message.
 
 Examples:
-  krypt init
+  npm install -g github:GarzvR/krypt-cli
+  krypt init --token=krp_xxx
+  krypt info
   krypt pull
-  krypt pull development
-  krypt pull --all
-  krypt pull staging --output=.env.stg
-  `);
-  process.exit(0);
+  krypt pull --output=.env.local
+`);
 }
 
-async function initConfig() {
-  const targetPath = path.join(process.cwd(), CONFIG_FILE);
-  if (fs.existsSync(targetPath)) {
-    console.log(`⚠️  ${CONFIG_FILE} already exists.`);
+function readConfig() {
+  const filePath = path.join(process.cwd(), CONFIG_FILE);
+
+  if (!fs.existsSync(filePath)) {
+    return {};
   }
 
-  let token = args.find((arg) => arg.startsWith("--token="))?.split("=")[1];
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    throw new Error(`Failed to read ${CONFIG_FILE}: ${error.message}`);
+  }
+}
+
+function writeConfig(config) {
+  fs.writeFileSync(
+    path.join(process.cwd(), CONFIG_FILE),
+    JSON.stringify(config, null, 2),
+  );
+}
+
+async function requestJson(baseUrl, endpoint, token) {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+  const response = await fetch(`${normalizedBaseUrl}/${endpoint}`, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const payload = await response.json().catch(async () => {
+    const raw = await response.text();
+    throw new Error(`Unexpected response: ${raw}`);
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      payload.error || `Request failed with status ${response.status}`,
+    );
+  }
+
+  return payload;
+}
+
+function resolveToken(flags, config) {
+  const token = typeof flags.token === "string" ? flags.token : config.token;
+
+  if (!token || typeof token !== "string") {
+    throw new Error("Missing token. Run `krypt init` or pass --token=<token>.");
+  }
+
+  return token.trim();
+}
+
+function resolveApiUrl(flags, config) {
+  const apiUrl =
+    (typeof flags["api-url"] === "string" && flags["api-url"]) ||
+    config.apiUrl ||
+    DEFAULT_BASE_URL;
+
+  return apiUrl.replace(/\/+$/, "");
+}
+
+async function initCommand(flags) {
+  let token = typeof flags.token === "string" ? flags.token.trim() : "";
 
   if (!token) {
     if (!process.stdin.isTTY) {
-      console.error("❌ Error: Non-interactive environment detected. Please provide --token=...");
-      process.exit(1);
+      throw new Error(
+        "Interactive setup requires a terminal. Pass --token=<token>.",
+      );
     }
-    console.log("Welcome to Krypt! Let's get you set up.");
-    token = await question("🔑 Enter your Environment API Key: ");
+
+    const rl = createPrompt();
+    try {
+      console.log("Krypt init");
+      token = String(
+        await askQuestion("Enter your environment token: ", rl),
+      ).trim();
+    } finally {
+      rl.close();
+    }
   }
 
   if (!token) {
-    console.error("❌ Error: API Key is required.");
-    process.exit(1);
+    throw new Error("Token is required.");
   }
 
-  const defaultConf = {
-    token: token.trim(),
-    projectSlug: ""
-  };
-
-  fs.writeFileSync(targetPath, JSON.stringify(defaultConf, null, 2));
-  console.log(`✅ Initialized ${CONFIG_FILE}`);
-  console.log(`Now you can run 'krypt pull' to fetch your secrets.`);
-  process.exit(0);
-}
-
-function loadConfig() {
-  const targetPath = path.join(process.cwd(), CONFIG_FILE);
-  if (fs.existsSync(targetPath)) {
-    try {
-      const content = fs.readFileSync(targetPath, "utf-8");
-      return JSON.parse(content);
-    } catch (err) {
-      console.error(`❌ Error reading ${CONFIG_FILE}: ${err.message}`);
-      return {};
-    }
-  }
-  return {};
-}
-
-function saveConfig(config) {
-  const targetPath = path.join(process.cwd(), CONFIG_FILE);
-  fs.writeFileSync(targetPath, JSON.stringify(config, null, 2));
-}
-
-async function fetchFromApi(endpoint, token) {
-  const apiUrl = endpoint.startsWith("http") ? endpoint : `${BASE_URL}/${endpoint}`;
-  
-  return new Promise((resolve, reject) => {
-    const client = apiUrl.startsWith("https") ? https : http;
-    
-    const req = client.get(
-      apiUrl,
-      {
-        headers: {
-          Authorization: `Bearer ${token.trim()}`,
-          Accept: "application/json",
-        },
-      },
-      (res) => {
-        let data = "";
-        res.on("data", (chunk) => {
-          data += chunk;
-        });
-        
-        res.on("end", () => {
-          try {
-            const parsedData = JSON.parse(data);
-            if (res.statusCode === 200) {
-              resolve(parsedData);
-            } else {
-              reject(new Error(parsedData.error || `API Error: ${res.statusCode}`));
-            }
-          } catch (e) {
-            reject(new Error(`Failed to parse response: ${data}`));
-          }
-        });
-      }
-    );
-    
-    req.on("error", (err) => {
-      reject(err);
-    });
+  writeConfig({
+    token,
+    apiUrl:
+      (typeof flags["api-url"] === "string" && flags["api-url"]) ||
+      DEFAULT_BASE_URL,
   });
+
+  console.log(`Wrote ${CONFIG_FILE}.`);
+  console.log("Run `krypt info` to verify the token scope.");
+}
+
+async function infoCommand(flags) {
+  const config = readConfig();
+  const token = resolveToken(flags, config);
+  const apiUrl = resolveApiUrl(flags, config);
+  const payload = await requestJson(apiUrl, "info", token);
+
+  console.log("Krypt token scope");
+  console.log(`User: ${payload.user}`);
+  console.log(`Project: ${payload.project.name} (/${payload.project.slug})`);
+  console.log(`Environment: ${payload.environment.name}`);
+  console.log(`Scope: ${payload.tokenScope}`);
+}
+
+function formatEnvFile(payload) {
+  const lines = [
+    `# Pulled from Krypt (${payload.project} - ${payload.environment})`,
+    `# Generated at: ${new Date().toISOString()}`,
+    "",
+  ];
+
+  for (const [key, value] of Object.entries(payload.secrets)) {
+    const normalizedValue =
+      typeof value === "string" &&
+      (value.includes(" ") || value.includes("\n") || value.includes('"'))
+        ? `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`
+        : value;
+
+    lines.push(`${key}=${normalizedValue}`);
+  }
+
+  lines.push("");
+  return lines.join("\n");
+}
+
+async function pullCommand(positional, flags) {
+  const config = readConfig();
+  const token = resolveToken(flags, config);
+  const apiUrl = resolveApiUrl(flags, config);
+  const requestedEnvironment = positional[1];
+  const info = await requestJson(apiUrl, "info", token);
+
+  if (
+    requestedEnvironment &&
+    requestedEnvironment.toLowerCase() !== info.environment.name.toLowerCase()
+  ) {
+    throw new Error(
+      `This token is scoped to '${info.environment.name}', not '${requestedEnvironment}'.`,
+    );
+  }
+
+  const query = new URLSearchParams({
+    envId: info.environment.id,
+    projectId: info.project.id,
+  });
+
+  const payload = await requestJson(apiUrl, `pull?${query.toString()}`, token);
+  const outputFile =
+    typeof flags.output === "string" && flags.output
+      ? flags.output
+      : `.env.${payload.environment}`;
+
+  fs.writeFileSync(
+    path.join(process.cwd(), outputFile),
+    formatEnvFile(payload),
+  );
+
+  console.log(`Wrote ${outputFile}`);
 }
 
 async function main() {
-  if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
-    showHelp();
+  const { positional, flags } = parseArgs(args);
+  const command = positional[0];
+
+  if (!command || flags.help || flags.h) {
+    printHelp();
+    return;
   }
 
-  const command = args[0];
-
-  if (command === "init") {
-    await initConfig();
-  }
-
-  if (command === "pull") {
-    const config = loadConfig();
-    
-    const tokenArg = args.find((arg) => arg.startsWith("--token="));
-    const outputArg = args.find((arg) => arg.startsWith("--output="));
-    const reselect = args.includes("--reselect");
-    const pullAll = args.includes("--all");
-    
-    // The environment name can be the 2nd argument (after 'pull') if it's not a flag
-    const envArg = args.slice(1).find(arg => !arg.startsWith("-"));
-
-    const token = tokenArg ? tokenArg.split("=")[1] : config.token;
-
-    if (!token) {
-      console.error("❌ Error: Missing API Key.");
-      console.log("Run 'krypt init' or provide --token=<your_api_key>");
-      process.exit(1);
-    }
-
-    try {
-      let projectSlug = config.projectSlug;
-
-      if (!projectSlug || reselect) {
-        console.log("🔍 Fetching your projects...");
-        const info = await fetchFromApi("info", token);
-        const { projects } = info;
-
-        if (!projects || projects.length === 0) {
-          console.error("❌ No projects found on your account.");
-          process.exit(1);
-        }
-
-        console.log("\nSelect a Project:");
-        projects.forEach((p, i) => console.log(`  [${i + 1}] ${p.name} (/${p.slug})`));
-        const pChoice = await question("\nEnter number: ");
-        const project = projects[parseInt(pChoice) - 1];
-
-        if (!project) {
-          console.error("❌ Invalid choice.");
-          process.exit(1);
-        }
-
-        projectSlug = project.slug;
-        config.projectSlug = projectSlug;
-        saveConfig(config);
-        console.log(`✨ Selected Project: ${project.name}`);
-      }
-
-      // Fetch project info to get available environments
-      const info = await fetchFromApi("info", token);
-      const project = info.projects.find(p => p.slug === projectSlug);
-
-      if (!project) {
-        console.error(`❌ Error: Project ${projectSlug} not found or access denied.`);
-        console.log("Try running with --reselect");
-        process.exit(1);
-      }
-
-      let envsToPull = [];
-
-      if (pullAll) {
-        envsToPull = project.environments.filter(e => e.name !== "universal");
-      } else if (envArg) {
-        const found = project.environments.find(e => e.name === envArg.toLowerCase());
-        if (!found) {
-          console.error(`❌ Error: Environment '${envArg}' not found in project ${project.name}.`);
-          console.log("Available environments:", project.environments.map(e => e.name).join(", "));
-          process.exit(1);
-        }
-        envsToPull = [found];
-      } else {
-        // Interactive selection if nothing specified
-        console.log(`\nSelect Environment for ${project.name}:`);
-        project.environments.forEach((e, i) => console.log(`  [${i + 1}] ${e.name}`));
-        const eChoice = await question("\nEnter number: ");
-        const env = project.environments[parseInt(eChoice) - 1];
-
-        if (!env) {
-          console.error("❌ Invalid choice.");
-          process.exit(1);
-        }
-        envsToPull = [env];
-      }
-
-      for (const env of envsToPull) {
-        console.log(`🔒 Pulling secrets for '${env.name}'...`);
-        const response = await fetchFromApi(`pull?projectSlug=${projectSlug}&envName=${env.name}`, token);
-        const { secrets, project: projName, environment } = response;
-        
-        let envContent = `# Pulled from Krypt (${projName} - ${environment})\n`;
-        envContent += `# Generated at: ${new Date().toISOString()}\n\n`;
-        
-        for (const [key, value] of Object.entries(secrets)) {
-          const safeValue = value.includes(" ") || value.includes("\n") ? `"${value.replace(/"/g, '\\"')}"` : value;
-          envContent += `${key}=${safeValue}\n`;
-        }
-
-        const fileName = outputArg ? outputArg.split("=")[1] : `.env.${env.name}`;
-        const targetPath = path.join(process.cwd(), fileName);
-        fs.writeFileSync(targetPath, envContent);
-        
-        console.log(`✅ Secrets written to ${fileName}`);
-      }
-
-      console.log(`\n🎉 Done!`);
-      process.exit(0);
-    } catch (err) {
-      console.error("❌ Error:");
-      console.error(err.message);
-      process.exit(1);
-    }
-  } else {
-    console.error(`❌ Unknown command: ${command}`);
-    showHelp();
+  switch (command) {
+    case "init":
+      await initCommand(flags);
+      return;
+    case "info":
+      await infoCommand(flags);
+      return;
+    case "pull":
+      await pullCommand(positional, flags);
+      return;
+    default:
+      throw new Error(`Unknown command: ${command}`);
   }
 }
 
-main();
+main().catch((error) => {
+  console.error(`Error: ${error.message}`);
+  process.exit(1);
+});

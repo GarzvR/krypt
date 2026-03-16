@@ -74,7 +74,9 @@ export default async function ProjectsPage() {
           <article
             key={item.label}
             className={`bg-white/[0.03] px-5 py-5 ${
-              index < list.length - 1 ? "border-b border-app md:border-b-0 md:border-r" : ""
+              index < list.length - 1
+                ? "border-b border-app md:border-b-0 md:border-r"
+                : ""
             }`}
           >
             <p className="text-sm text-app-muted">{item.label}</p>
@@ -87,7 +89,9 @@ export default async function ProjectsPage() {
 
       <section className="border border-app bg-white/[0.03]">
         <div className="flex flex-col gap-4 border-b border-app px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
-          <p className="text-base font-semibold text-app-foreground">Create project</p>
+          <p className="text-base font-semibold text-app-foreground">
+            Create project
+          </p>
           <Link
             href="/dashboard"
             className="inline-flex h-11 items-center border border-app bg-white/[0.04] px-4 text-sm font-medium text-app-foreground hover:bg-white/[0.08]"
@@ -96,7 +100,10 @@ export default async function ProjectsPage() {
           </Link>
         </div>
 
-        <form action={createProject} className="grid gap-3 p-5 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <form
+          action={createProject}
+          className="grid gap-3 p-5 lg:grid-cols-[minmax(0,1fr)_auto]"
+        >
           <input
             type="text"
             name="name"
@@ -115,7 +122,9 @@ export default async function ProjectsPage() {
 
       {projects.length === 0 ? (
         <div className="border border-dashed border-app px-6 py-16 text-center">
-          <p className="text-lg font-semibold text-app-foreground">No projects yet.</p>
+          <p className="text-lg font-semibold text-app-foreground">
+            No projects yet.
+          </p>
           <p className="mt-2 text-sm text-app-muted">
             Create your first project to start managing secrets.
           </p>
@@ -124,19 +133,31 @@ export default async function ProjectsPage() {
         <div className="space-y-6">
           {projects.map((project, index) => {
             const environmentMap = new Map(
-              project.environments.map((environment) => [environment.name, environment]),
+              project.environments.map((environment) => [
+                environment.name,
+                environment,
+              ]),
             );
             const secretCount = project.environments.reduce(
-              (accumulator, environment) => accumulator + environment.secrets.length,
+              (accumulator, environment) =>
+                accumulator + environment.secrets.length,
               0,
             );
 
-            const sortedEnvironments = [...project.environments].sort((a, b) => {
-              const aIndex = ENVIRONMENT_ORDER.indexOf(a.name as (typeof ENVIRONMENT_ORDER)[number]);
-              const bIndex = ENVIRONMENT_ORDER.indexOf(b.name as (typeof ENVIRONMENT_ORDER)[number]);
+            const sortedEnvironments = [...project.environments].sort(
+              (a, b) => {
+                const aIndex = ENVIRONMENT_ORDER.indexOf(
+                  a.name as (typeof ENVIRONMENT_ORDER)[number],
+                );
+                const bIndex = ENVIRONMENT_ORDER.indexOf(
+                  b.name as (typeof ENVIRONMENT_ORDER)[number],
+                );
 
-              return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
-            });
+                return (
+                  (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex)
+                );
+              },
+            );
 
             return (
               <details
@@ -150,7 +171,9 @@ export default async function ProjectsPage() {
                       <h2 className="text-2xl font-semibold tracking-tight text-app-foreground">
                         {project.name}
                       </h2>
-                      <p className="mt-2 text-sm text-app-muted">/{project.slug}</p>
+                      <p className="mt-2 text-sm text-app-muted">
+                        /{project.slug}
+                      </p>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-3">
@@ -180,7 +203,8 @@ export default async function ProjectsPage() {
                   <div className="border border-app p-4">
                     <div className="flex flex-wrap gap-2">
                       {ENVIRONMENT_ORDER.map((environmentName) => {
-                        const existingEnvironment = environmentMap.get(environmentName);
+                        const existingEnvironment =
+                          environmentMap.get(environmentName);
 
                         if (existingEnvironment) {
                           return (
@@ -194,9 +218,20 @@ export default async function ProjectsPage() {
                         }
 
                         return (
-                          <form key={environmentName} action={createEnvironment}>
-                            <input type="hidden" name="projectId" value={project.id} />
-                            <input type="hidden" name="name" value={environmentName} />
+                          <form
+                            key={environmentName}
+                            action={createEnvironment}
+                          >
+                            <input
+                              type="hidden"
+                              name="projectId"
+                              value={project.id}
+                            />
+                            <input
+                              type="hidden"
+                              name="name"
+                              value={environmentName}
+                            />
                             <button
                               type="submit"
                               className="border border-app bg-white/[0.04] px-3 py-2 text-xs font-semibold capitalize text-app-foreground hover:bg-white/[0.08]"
@@ -209,11 +244,12 @@ export default async function ProjectsPage() {
                     </div>
 
                     <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
-                      <form
-                        action={createEnvironment}
-                        className="contents"
-                      >
-                        <input type="hidden" name="projectId" value={project.id} />
+                      <form action={createEnvironment} className="contents">
+                        <input
+                          type="hidden"
+                          name="projectId"
+                          value={project.id}
+                        />
                         <input
                           type="text"
                           name="name"
@@ -229,7 +265,11 @@ export default async function ProjectsPage() {
                         </button>
                       </form>
                       <form action={deleteProject}>
-                        <input type="hidden" name="projectId" value={project.id} />
+                        <input
+                          type="hidden"
+                          name="projectId"
+                          value={project.id}
+                        />
                         <button
                           type="submit"
                           className="h-11 border border-rose-400/25 bg-rose-400/10 px-4 text-sm font-semibold text-rose-300 hover:bg-rose-400/15"
@@ -246,7 +286,11 @@ export default async function ProjectsPage() {
                     </p>
                   ) : (
                     sortedEnvironments.map((environment) => (
-                      <details key={environment.id} className="group overflow-hidden border border-app bg-black/10" open>
+                      <details
+                        key={environment.id}
+                        className="group overflow-hidden border border-app bg-black/10"
+                        open
+                      >
                         <summary className="flex cursor-pointer items-center justify-between border-b border-app bg-white/[0.03] px-5 py-4 transition-colors hover:bg-white/[0.05] marker:content-[''] [&::-webkit-details-marker]:hidden">
                           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                             <div className="flex items-center gap-4">
@@ -266,7 +310,10 @@ export default async function ProjectsPage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex flex-wrap gap-3 [&>*]:pointer-events-auto" style={{ pointerEvents: "auto" }}>
+                            <div
+                              className="flex flex-wrap gap-3 [&>*]:pointer-events-auto"
+                              style={{ pointerEvents: "auto" }}
+                            >
                               <a
                                 href={`/api/environments/${environment.id}/export`}
                                 className="inline-flex h-11 items-center justify-center border border-app bg-white/[0.04] px-4 text-sm font-semibold text-app-foreground hover:bg-white/[0.08]"
@@ -274,7 +321,11 @@ export default async function ProjectsPage() {
                                 Export .env
                               </a>
                               <form action={deleteEnvironment}>
-                                <input type="hidden" name="environmentId" value={environment.id} />
+                                <input
+                                  type="hidden"
+                                  name="environmentId"
+                                  value={environment.id}
+                                />
                                 <button
                                   type="submit"
                                   className="h-11 border border-rose-400/25 bg-rose-400/10 px-4 text-sm font-semibold text-rose-300 hover:bg-rose-400/15"
@@ -291,7 +342,11 @@ export default async function ProjectsPage() {
                             action={createSecret}
                             className="grid gap-3 border-b border-app pb-5 xl:grid-cols-[1.2fr_1.2fr_1fr_auto]"
                           >
-                            <input type="hidden" name="environmentId" value={environment.id} />
+                            <input
+                              type="hidden"
+                              name="environmentId"
+                              value={environment.id}
+                            />
                             <input
                               type="text"
                               name="key"
@@ -329,10 +384,18 @@ export default async function ProjectsPage() {
                               <table className="min-w-full text-left text-sm">
                                 <thead className="border-b border-app">
                                   <tr>
-                                    <th className="px-5 py-4 font-semibold text-app-foreground">Key</th>
-                                    <th className="px-5 py-4 font-semibold text-app-foreground">Value</th>
-                                    <th className="px-5 py-4 font-semibold text-app-foreground">Created</th>
-                                    <th className="px-5 py-4 font-semibold text-app-foreground">Action</th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">
+                                      Key
+                                    </th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">
+                                      Value
+                                    </th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">
+                                      Created
+                                    </th>
+                                    <th className="px-5 py-4 font-semibold text-app-foreground">
+                                      Action
+                                    </th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/10">
@@ -350,7 +413,11 @@ export default async function ProjectsPage() {
                                       </td>
                                       <td className="px-5 py-4">
                                         <form action={deleteSecret}>
-                                          <input type="hidden" name="secretId" value={secret.id} />
+                                          <input
+                                            type="hidden"
+                                            name="secretId"
+                                            value={secret.id}
+                                          />
                                           <button
                                             type="submit"
                                             className="border border-rose-400/25 bg-rose-400/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-400/15"
@@ -365,26 +432,48 @@ export default async function ProjectsPage() {
                               </table>
                             </div>
                           )}
-                          
+
                           <div className="mt-8 grid gap-8 lg:grid-cols-2">
                             {/* CLI Info */}
                             <div className="border-t border-app pt-6">
-                              <h4 className="text-sm font-semibold text-app-foreground mb-4">Connect via CLI</h4>
+                              <h4 className="text-sm font-semibold text-app-foreground mb-4">
+                                Connect via CLI
+                              </h4>
                               <div className="bg-black/20 p-4 font-mono text-sm text-app-foreground overflow-x-auto border border-white/5">
-                                <p className="mb-2 text-app-muted">Fetch secrets for this environment:</p>
-                                <code className="block mb-4 text-white">npx krypt-cli pull {environment.name}</code>
+                                <p className="mb-2 text-app-muted">
+                                  This token only works for this environment:
+                                </p>
+                                <code className="block mb-2 text-white">
+                                  npm install -g github:GarzvR/krypt-cli
+                                </code>
+                                <code className="block mb-4 text-white">
+                                  krypt init --token=&lt;token&gt;
+                                </code>
+                                <code className="block mb-4 text-white">
+                                  krypt pull
+                                </code>
                                 <p className="border-t border-white/5 pt-4 text-xs text-app-muted italic">
-                                  Use the token generated on the right for authentication.
+                                  Use the token generated on the right for
+                                  authentication.
                                 </p>
                               </div>
                             </div>
 
                             {/* API Keys */}
                             <div className="border-t border-app pt-6">
-                              <h4 className="text-sm font-semibold text-app-foreground mb-4">API Tokens</h4>
+                              <h4 className="text-sm font-semibold text-app-foreground mb-4">
+                                API Tokens
+                              </h4>
                               <div className="space-y-4">
-                                <form action={createApiKey} className="flex gap-2">
-                                  <input type="hidden" name="environmentId" value={environment.id} />
+                                <form
+                                  action={createApiKey}
+                                  className="flex gap-2"
+                                >
+                                  <input
+                                    type="hidden"
+                                    name="environmentId"
+                                    value={environment.id}
+                                  />
                                   <input
                                     type="text"
                                     name="name"
@@ -402,27 +491,47 @@ export default async function ProjectsPage() {
 
                                 <div className="space-y-2">
                                   {environment.apiKeys.length === 0 ? (
-                                    <p className="text-[10px] text-app-muted italic">No tokens active.</p>
+                                    <p className="text-[10px] text-app-muted italic">
+                                      No tokens active.
+                                    </p>
                                   ) : (
                                     environment.apiKeys.map((key) => (
-                                      <div key={key.id} className="flex items-center justify-between border border-white/5 bg-white/[0.02] p-2 pr-1">
+                                      <div
+                                        key={key.id}
+                                        className="flex items-center justify-between border border-white/5 bg-white/[0.02] p-2 pr-1"
+                                      >
                                         <div className="flex items-center gap-2 min-w-0">
-                                          <Command size={14} className="text-app-muted shrink-0" />
+                                          <Command
+                                            size={14}
+                                            className="text-app-muted shrink-0"
+                                          />
                                           <div className="min-w-0">
-                                            <p className="text-[10px] font-semibold text-white truncate">{key.name}</p>
-                                            <code className="text-[10px] text-app-muted font-mono">{key.key.substring(0, 6)}•••</code>
+                                            <p className="text-[10px] font-semibold text-white truncate">
+                                              {key.name}
+                                            </p>
+                                            <code className="text-[10px] text-app-muted font-mono">
+                                              {key.key.substring(0, 6)}•••
+                                            </code>
                                           </div>
                                         </div>
                                         <div className="flex items-center gap-1">
                                           <CopyButton value={key.key} />
                                           <form action={deleteApiKey}>
-                                            <input type="hidden" name="apiKeyId" value={key.id} />
+                                            <input
+                                              type="hidden"
+                                              name="apiKeyId"
+                                              value={key.id}
+                                            />
                                             <button
                                               type="submit"
                                               className="p-1.5 text-rose-400/40 hover:text-rose-400 transition-colors"
                                               title="Revoke Token"
                                             >
-                                              <CaretDown size={14} className="rotate-45" /> {/* Placeholder for a better 'X' if needed */}
+                                              <CaretDown
+                                                size={14}
+                                                className="rotate-45"
+                                              />{" "}
+                                              {/* Placeholder for a better 'X' if needed */}
                                             </button>
                                           </form>
                                         </div>

@@ -2,9 +2,6 @@
   "name": "krypt",
   "version": "0.1.0",
   "private": true,
-  "bin": {
-    "krypt-cli": "./cli/krypt.js"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,7 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "krypt": "node cli/krypt.js"
+    "cli:local": "node cli/krypt.js"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

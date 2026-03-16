@@ -6,11 +6,9 @@ import {
   ArrowSquareOut,
   ChartBar,
   ClockCounterClockwise,
-
   House,
   SquaresFour,
   BookOpen,
-  UserCircle as UserCircleIcon,
 } from "@phosphor-icons/react";
 
 const NAV_ITEMS = [
@@ -29,7 +27,7 @@ export function DashboardNav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
 
   const activeItems = NAV_ITEMS.filter(
-    (item) => item.href !== "/audit-logs" || isAdmin
+    (item) => item.href !== "/audit-logs" || isAdmin,
   );
 
   return (

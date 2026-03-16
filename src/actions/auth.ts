@@ -7,9 +7,36 @@ import { prisma } from "@/lib/prisma";
 import { parseCredentials } from "@/lib/validations/auth";
 import { isRedirectError } from "next/dist/client/components/redirect";
 
-function withError(path: "/sign-in" | "/sign-up", message: string) {
+function withError(
+  path: "/sign-in" | "/sign-up",
+  message: string,
+  redirectTo?: string,
+) {
   const params = new URLSearchParams({ error: message });
+
+  if (
+    redirectTo &&
+    redirectTo.startsWith("/") &&
+    !redirectTo.startsWith("//")
+  ) {
+    params.set("redirectTo", redirectTo);
+  }
+
   return `${path}?${params.toString()}`;
+}
+
+function resolveRedirectTarget(formData: FormData) {
+  const redirectTo = formData.get("redirectTo");
+
+  if (typeof redirectTo !== "string" || redirectTo.length === 0) {
+    return "/dashboard";
+  }
+
+  if (!redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+    return "/dashboard";
+  }
+
+  return redirectTo;
 }
 
 export async function signUpAction(formData: FormData) {
@@ -28,7 +55,9 @@ export async function signUpAction(formData: FormData) {
   });
 
   if (existingUser) {
-    redirect(withError("/sign-up", "An account with this email already exists."));
+    redirect(
+      withError("/sign-up", "An account with this email already exists."),
+    );
   }
 
   try {
@@ -44,18 +73,24 @@ export async function signUpAction(formData: FormData) {
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Sign up error:", error);
-    redirect(withError("/sign-up", "An unexpected error occurred during sign up. Please try again."));
+    redirect(
+      withError(
+        "/sign-up",
+        "An unexpected error occurred during sign up. Please try again.",
+      ),
+    );
   }
-  
+
   redirect("/dashboard");
 }
 
 export async function signInAction(formData: FormData) {
   const parsed = parseCredentials(formData);
+  const redirectTarget = resolveRedirectTarget(formData);
 
   if (!parsed.success) {
     const error = parsed.error.issues[0]?.message ?? "Invalid credentials.";
-    redirect(withError("/sign-in", error));
+    redirect(withError("/sign-in", error, redirectTarget));
   }
 
   const { email, password } = parsed.data;
@@ -67,23 +102,33 @@ export async function signInAction(formData: FormData) {
     });
 
     if (!user) {
-      redirect(withError("/sign-in", "Invalid email or password."));
+      redirect(
+        withError("/sign-in", "Invalid email or password.", redirectTarget),
+      );
     }
 
     const passwordMatches = await verifyPassword(password, user.passwordHash);
 
     if (!passwordMatches) {
-      redirect(withError("/sign-in", "Invalid email or password."));
+      redirect(
+        withError("/sign-in", "Invalid email or password.", redirectTarget),
+      );
     }
 
     createSession(user.id);
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Sign in error:", error);
-    redirect(withError("/sign-in", "An unexpected error occurred during sign in."));
+    redirect(
+      withError(
+        "/sign-in",
+        "An unexpected error occurred during sign in.",
+        redirectTarget,
+      ),
+    );
   }
-  
-  redirect("/dashboard");
+
+  redirect(redirectTarget);
 }
 
 export async function signOutAction() {

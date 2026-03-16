@@ -18,6 +18,19 @@ function requireSessionUserId() {
   return sessionUserId;
 }
 
+function redirectToUpgrade(reason: "projects" | "environments" | "secrets") {
+  redirect(`/usage?upgrade=${reason}`);
+}
+
+async function getUserPlan(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { planId: true },
+  });
+
+  return getCurrentPlan(user?.planId);
+}
+
 async function getActorEmail(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -71,7 +84,7 @@ async function getUniqueProjectSlug(baseName: string) {
 export async function createProject(formData: FormData) {
   const sessionUserId = requireSessionUserId();
   const name = formData.get("name")?.toString().trim() ?? "";
-  const currentPlan = getCurrentPlan();
+  const currentPlan = await getUserPlan(sessionUserId);
 
   if (!name) {
     return;
@@ -82,7 +95,7 @@ export async function createProject(formData: FormData) {
   });
 
   if (hasReachedLimit(projectCount, currentPlan.projectLimit)) {
-    return;
+    redirectToUpgrade("projects");
   }
 
   const slug = await getUniqueProjectSlug(name);
@@ -106,13 +119,14 @@ export async function createProject(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/projects");
+  revalidatePath("/account");
 }
 
 export async function createEnvironment(formData: FormData) {
   const sessionUserId = requireSessionUserId();
   const projectId = formData.get("projectId")?.toString() ?? "";
   const name = normalizeEnvironmentName(formData.get("name")?.toString() ?? "");
-  const currentPlan = getCurrentPlan();
+  const currentPlan = await getUserPlan(sessionUserId);
 
   if (!projectId || !name) {
     return;
@@ -139,7 +153,7 @@ export async function createEnvironment(formData: FormData) {
   });
 
   if (hasReachedLimit(environmentCount, currentPlan.environmentLimit)) {
-    return;
+    redirectToUpgrade("environments");
   }
 
   await prisma.environment.upsert({
@@ -176,7 +190,7 @@ export async function createSecret(formData: FormData) {
   const key = normalizeSecretKey(formData.get("key")?.toString() ?? "");
   const value = formData.get("value")?.toString() ?? "";
   const description = formData.get("description")?.toString().trim() ?? "";
-  const currentPlan = getCurrentPlan();
+  const currentPlan = await getUserPlan(sessionUserId);
 
   if (!environmentId || !key || !value) {
     return;
@@ -218,7 +232,7 @@ export async function createSecret(formData: FormData) {
     });
 
     if (hasReachedLimit(secretCount, currentPlan.secretLimit)) {
-      return;
+      redirectToUpgrade("secrets");
     }
   }
 
@@ -274,7 +288,11 @@ export async function deleteSecret(formData: FormData) {
         },
       },
     },
-    select: { id: true, key: true, environment: { select: { projectId: true } } },
+    select: {
+      id: true,
+      key: true,
+      environment: { select: { projectId: true } },
+    },
   });
 
   if (!secret) {
@@ -422,6 +440,7 @@ export async function createApiKey(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/projects");
+  revalidatePath("/account");
 }
 
 export async function deleteApiKey(formData: FormData) {
@@ -459,4 +478,3 @@ export async function deleteApiKey(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/projects");
 }
-

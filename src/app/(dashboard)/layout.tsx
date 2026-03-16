@@ -2,6 +2,7 @@ import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { signOutAction } from "@/actions/auth";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { DashboardSearch } from "@/components/dashboard-search";
+import { UpgradeBanner } from "@/components/upgrade-banner";
 import { isAdmin } from "@/lib/admin";
 import { destroySession, getSessionUserId } from "@/lib/auth/session";
 import { getCurrentPlan, getSecretUsage } from "@/lib/plans";
@@ -23,7 +24,7 @@ export default async function DashboardLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: sessionUserId },
-    select: { email: true },
+    select: { email: true, planId: true },
   });
   const secretCount = await prisma.secret.count({
     where: {
@@ -47,7 +48,7 @@ export default async function DashboardLayout({
       .filter(Boolean)
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" ") || "Workspace User";
-  const currentPlan = getCurrentPlan();
+  const currentPlan = getCurrentPlan(user.planId);
   const usagePercent = getSecretUsage(secretCount, currentPlan.secretLimit);
   const admin = await isAdmin();
 
@@ -117,6 +118,7 @@ export default async function DashboardLayout({
           </div>
 
           <div className="scrollbar-hidden min-h-0 flex-1 overflow-y-auto pt-4">
+            <UpgradeBanner />
             {children}
           </div>
         </main>

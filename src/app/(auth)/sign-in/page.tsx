@@ -5,11 +5,13 @@ import { PasswordInput } from "@/components/auth/password-input";
 type SignInPageProps = {
   searchParams?: {
     error?: string;
+    redirectTo?: string;
   };
 };
 
 export default function SignInPage({ searchParams }: SignInPageProps) {
   const error = searchParams?.error;
+  const redirectTo = searchParams?.redirectTo;
 
   return (
     <div>
@@ -18,7 +20,6 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
         Sign in
       </h2>
 
-
       {error ? (
         <p className="mt-5 border border-rose-400/25 bg-rose-400/10 px-4 py-3 text-sm text-rose-300">
           {error}
@@ -26,6 +27,9 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
       ) : null}
 
       <form action={signInAction} className="mt-8 space-y-5">
+        {redirectTo ? (
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+        ) : null}
         <label className="block">
           <span className="mb-2 block text-sm font-medium text-app-foreground">
             Email

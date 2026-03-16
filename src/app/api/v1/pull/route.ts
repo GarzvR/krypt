@@ -21,18 +21,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const envId = req.nextUrl.searchParams.get("envId");
-    const envName = req.nextUrl.searchParams.get("envName");
-    const projectId = req.nextUrl.searchParams.get("projectId");
-    const projectSlug = req.nextUrl.searchParams.get("projectSlug");
-
-    if (!envId && !envName) {
-      return NextResponse.json(
-        { error: "Missing environment identifier (envId or envName)" },
-        { status: 400 },
-      );
-    }
-
     const apiKey = await getApiKeyContextByToken(token);
 
     if (!apiKey) {
@@ -43,6 +31,11 @@ export async function GET(req: NextRequest) {
     }
 
     const targetEnv = apiKey.environment;
+
+    const projectId = req.nextUrl.searchParams.get("projectId");
+    const projectSlug = req.nextUrl.searchParams.get("projectSlug");
+    const envId = req.nextUrl.searchParams.get("envId");
+    const envName = req.nextUrl.searchParams.get("envName");
 
     if (envId && envId !== targetEnv.id) {
       return NextResponse.json(

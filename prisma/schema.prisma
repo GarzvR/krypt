@@ -11,6 +11,7 @@ model User {
   id                         String     @id @default(cuid())
   email                      String     @unique
   passwordHash               String
+  emailVerifiedAt            DateTime?
   createdAt                  DateTime   @default(now())
   updatedAt                  DateTime   @updatedAt
   role                       String     @default("user") // "user" or "admin"
@@ -23,6 +24,19 @@ model User {
   projects                   Project[]
   auditLogs                  AuditLog[]
   apiKeys                    ApiKey[]
+  emailVerificationTokens    EmailVerificationToken[]
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Project {

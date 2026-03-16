@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { issueAndSendEmailVerification } from "@/lib/auth/email-verification";
 import { prisma } from "@/lib/prisma";
 import { parseCredentials } from "@/lib/validations/auth";
 import { isRedirectError } from "next/dist/client/components/redirect";
@@ -23,6 +25,38 @@ function withError(
   }
 
   return `${path}?${params.toString()}`;
+}
+
+function withNotice(
+  path: "/sign-in" | "/sign-up",
+  message: string,
+  options?: { email?: string; redirectTo?: string },
+) {
+  const params = new URLSearchParams({ notice: message });
+
+  if (options?.email) {
+    params.set("email", options.email);
+  }
+
+  if (
+    options?.redirectTo &&
+    options.redirectTo.startsWith("/") &&
+    !options.redirectTo.startsWith("//")
+  ) {
+    params.set("redirectTo", options.redirectTo);
+  }
+
+  return `${path}?${params.toString()}`;
+}
+
+const emailOnlySchema = z.object({
+  email: z.string().trim().email("Enter a valid email address.").toLowerCase(),
+});
+
+function parseEmailOnly(formData: FormData) {
+  return emailOnlySchema.safeParse({
+    email: formData.get("email"),
+  });
 }
 
 function resolveRedirectTarget(formData: FormData) {
@@ -51,10 +85,33 @@ export async function signUpAction(formData: FormData) {
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
-    select: { id: true },
+    select: { id: true, emailVerifiedAt: true },
   });
 
   if (existingUser) {
+    if (!existingUser.emailVerifiedAt) {
+      try {
+        await issueAndSendEmailVerification(existingUser.id, email);
+      } catch (error) {
+        if (isRedirectError(error)) throw error;
+        console.error("Resend verification on sign up error:", error);
+        redirect(
+          withError(
+            "/sign-in",
+            "We could not send the verification email right now. Check your sender domain in Resend and try again.",
+          ) + `&email=${encodeURIComponent(email)}`,
+        );
+      }
+
+      redirect(
+        withNotice(
+          "/sign-in",
+          "This email is already registered but not verified yet. We sent a fresh verification link.",
+          { email },
+        ),
+      );
+    }
+
     redirect(
       withError("/sign-up", "An account with this email already exists."),
     );
@@ -66,10 +123,10 @@ export async function signUpAction(formData: FormData) {
         email,
         passwordHash: await hashPassword(password),
       },
-      select: { id: true },
+      select: { id: true, email: true },
     });
 
-    createSession(user.id);
+    await issueAndSendEmailVerification(user.id, user.email);
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Sign up error:", error);
@@ -81,7 +138,13 @@ export async function signUpAction(formData: FormData) {
     );
   }
 
-  redirect("/dashboard");
+  redirect(
+    withNotice(
+      "/sign-in",
+      "Check your email and open the verification link before signing in.",
+      { email },
+    ),
+  );
 }
 
 export async function signInAction(formData: FormData) {
@@ -98,7 +161,7 @@ export async function signInAction(formData: FormData) {
   try {
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, passwordHash: true },
+      select: { id: true, passwordHash: true, emailVerifiedAt: true },
     });
 
     if (!user) {
@@ -112,6 +175,16 @@ export async function signInAction(formData: FormData) {
     if (!passwordMatches) {
       redirect(
         withError("/sign-in", "Invalid email or password.", redirectTarget),
+      );
+    }
+
+    if (!user.emailVerifiedAt) {
+      redirect(
+        withError(
+          "/sign-in",
+          "Verify your email first. We only allow sign in for verified accounts.",
+          redirectTarget,
+        ) + `&email=${encodeURIComponent(email)}`,
       );
     }
 
@@ -129,6 +202,49 @@ export async function signInAction(formData: FormData) {
   }
 
   redirect(redirectTarget);
+}
+
+export async function resendVerificationEmailAction(formData: FormData) {
+  const parsed = parseEmailOnly(formData);
+
+  if (!parsed.success) {
+    redirect(
+      withError(
+        "/sign-in",
+        parsed.error.issues[0]?.message ?? "Invalid email.",
+      ),
+    );
+  }
+
+  const { email } = parsed.data;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, emailVerifiedAt: true },
+    });
+
+    if (user && !user.emailVerifiedAt) {
+      await issueAndSendEmailVerification(user.id, email);
+    }
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    console.error("Resend verification email error:", error);
+    redirect(
+      withError(
+        "/sign-in",
+        "We could not send the verification email right now. Please try again.",
+      ) + `&email=${encodeURIComponent(email)}`,
+    );
+  }
+
+  redirect(
+    withNotice(
+      "/sign-in",
+      "If that email exists and is not verified yet, a verification link has been sent.",
+      { email },
+    ),
+  );
 }
 
 export async function signOutAction() {

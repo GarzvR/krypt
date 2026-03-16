@@ -80,18 +80,18 @@ export default function DocsPage() {
   );
 
   return (
-    <div className="mx-auto max-w-4xl py-12 px-4 pb-32">
-      <motion.div {...fadeIn} className="mb-16">
-        <div className="flex items-center gap-2 text-app-primary mb-4 text-xs font-bold uppercase tracking-[0.2em]">
-          <Lightning size={16} weight="fill" />
+    <div className="mx-auto max-w-5xl py-12 px-6 pb-32">
+      <motion.div {...fadeIn} className="mb-20 text-center">
+        <div className="flex items-center justify-center gap-2 text-app-primary mb-6 text-xs font-bold uppercase tracking-[0.3em]">
+          <Lightning size={18} weight="fill" />
           <span>Setup Guide</span>
         </div>
-        <h1 className="text-4xl font-black tracking-tight text-white mb-6 lg:text-5xl">
+        <h1 className="text-5xl font-black tracking-tight text-white mb-8 lg:text-7xl">
           Documentation <span className="text-app-primary">Viewer</span>
         </h1>
-        <p className="text-lg text-app-muted leading-relaxed max-w-2xl">
-          Krypt CLI is meant to stay simple: install once, connect your token,
-          then pull your secrets when you need them.
+        <div className="mx-auto h-1 w-20 bg-app-primary mb-8" />
+        <p className="mx-auto text-xl text-app-muted leading-relaxed max-w-3xl">
+          Krypt CLI is designed for speed and security. Install once, connect your environment-specific token, and pull your secrets with zero friction.
         </p>
       </motion.div>
 

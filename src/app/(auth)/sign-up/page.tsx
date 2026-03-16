@@ -5,11 +5,13 @@ import { PasswordInput } from "@/components/auth/password-input";
 type SignUpPageProps = {
   searchParams?: {
     error?: string;
+    notice?: string;
   };
 };
 
 export default function SignUpPage({ searchParams }: SignUpPageProps) {
   const error = searchParams?.error;
+  const notice = searchParams?.notice;
 
   return (
     <div>
@@ -18,10 +20,15 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
         Start free
       </h2>
 
-
       {error ? (
         <p className="mt-5 border border-rose-400/25 bg-rose-400/10 px-4 py-3 text-sm text-rose-300">
           {error}
+        </p>
+      ) : null}
+
+      {notice ? (
+        <p className="mt-5 border border-app-primary/20 bg-app-primary/10 px-4 py-3 text-sm text-app-primary">
+          {notice}
         </p>
       ) : null}
 

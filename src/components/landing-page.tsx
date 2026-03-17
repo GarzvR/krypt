@@ -391,6 +391,18 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
               >
                 Documentation
               </Link>
+              <Link
+                href="/terms"
+                className="transition-colors hover:text-app-primary"
+              >
+                Terms
+              </Link>
+              <Link
+                href="/refund-policy"
+                className="transition-colors hover:text-app-primary"
+              >
+                Refund Policy
+              </Link>
             </div>
           </div>
         </footer>

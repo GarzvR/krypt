@@ -95,10 +95,12 @@ export async function signUpAction(formData: FormData) {
       } catch (error) {
         if (isRedirectError(error)) throw error;
         console.error("Resend verification on sign up error:", error);
+        
+        const message = error instanceof Error ? error.message : "Email delivery failed.";
         redirect(
           withError(
             "/sign-in",
-            "We could not send the verification email right now. Check your sender domain in Resend and try again.",
+            `We could not send the verification email: ${message} (Check Resend domain verification)`,
           ) + `&email=${encodeURIComponent(email)}`,
         );
       }
@@ -130,10 +132,15 @@ export async function signUpAction(formData: FormData) {
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Sign up error:", error);
+    
+    const message = error instanceof Error && error.message.includes("Verification") 
+      ? `Email error: ${error.message}`
+      : "An unexpected error occurred during sign up. Please try again.";
+
     redirect(
       withError(
         "/sign-up",
-        "An unexpected error occurred during sign up. Please try again.",
+        message,
       ),
     );
   }
@@ -230,10 +237,12 @@ export async function resendVerificationEmailAction(formData: FormData) {
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Resend verification email error:", error);
+    
+    const message = error instanceof Error ? error.message : "Delivery failed.";
     redirect(
       withError(
         "/sign-in",
-        "We could not send the verification email right now. Please try again.",
+        `Email delivery failed: ${message}`,
       ) + `&email=${encodeURIComponent(email)}`,
     );
   }

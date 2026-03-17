@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
-  CaretDown,
-  Command,
   Plus,
   Trash,
   Globe,
@@ -12,14 +10,11 @@ import {
   ShieldCheck,
   Key as KeyIcon,
   X,
-  CornersOut,
   Lightning,
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CopyButton } from "@/components/copy-button";
 import { SmartForm, SubmitButton } from "@/components/smart-form";
-
-const ENVIRONMENT_ORDER = ["development"] as const;
 
 function maskSecret(value: string) {
   return "*".repeat(Math.min(Math.max(value.length, 6), 16));
@@ -33,9 +28,19 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 interface Environment {
   id: string;
   name: string;
-  secrets: any[];
-  apiKeys: any[];
   projectId: string;
+  createdAt: Date;
+  secrets: {
+    id: string;
+    key: string;
+    value: string;
+    createdAt: Date;
+  }[];
+  apiKeys: {
+    id: string;
+    name: string;
+    key: string;
+  }[];
   project: {
     id: string;
     name: string;
@@ -43,20 +48,27 @@ interface Environment {
   };
 }
 
+interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  environments: Environment[];
+}
+
 export function ProjectClient({
   projects: initialProjects,
   actions,
 }: {
-  projects: any[];
+  projects: Project[];
   actions: {
-    createProject: any;
-    createEnvironment: any;
-    deleteProject: any;
-    deleteEnvironment: any;
-    createSecret: any;
-    deleteSecret: any;
-    createApiKey: any;
-    deleteApiKey: any;
+    createProject: (formData: FormData) => Promise<void>;
+    createEnvironment: (formData: FormData) => Promise<void>;
+    deleteProject: (formData: FormData) => Promise<void>;
+    deleteEnvironment: (formData: FormData) => Promise<void>;
+    createSecret: (formData: FormData) => Promise<void>;
+    deleteSecret: (formData: FormData) => Promise<void>;
+    createApiKey: (formData: FormData) => Promise<void>;
+    deleteApiKey: (formData: FormData) => Promise<void>;
   };
 }) {
   const [activeEnvironments, setActiveEnvironments] = useState<
@@ -67,7 +79,7 @@ export function ProjectClient({
       if (p.environments.length > 0) {
         // Find development if it exists, otherwise first one
         const devEnv = p.environments.find(
-          (e: any) => e.name === "development",
+          (e) => e.name === "development",
         );
         initial[p.id] = devEnv ? "development" : p.environments[0].name;
       } else {
@@ -85,7 +97,7 @@ export function ProjectClient({
     (accumulator, project) => {
       accumulator.environments += project.environments.length;
       accumulator.secrets += project.environments.reduce(
-        (secretTotal: number, environment: any) =>
+        (secretTotal: number, environment) =>
           secretTotal + environment.secrets.length,
         0,
       );
@@ -253,9 +265,9 @@ export function ProjectClient({
         </div>
       ) : (
         <div className="space-y-6">
-          {initialProjects.map((project, index) => {
+          {initialProjects.map((project) => {
             const environmentMap = new Map<string, Environment>(
-              project.environments.map((env: any) => [env.name, env]),
+              project.environments.map((env) => [env.name, env]),
             );
 
             const activeEnvName = activeEnvironments[project.id];
@@ -265,7 +277,7 @@ export function ProjectClient({
 
             // Sort environments so development is first, then alphabetical
             const projectEnvs = [...project.environments].sort(
-              (a: any, b: any) => {
+              (a, b) => {
                 if (a.name === "development") return -1;
                 if (b.name === "development") return 1;
                 return a.name.localeCompare(b.name);
@@ -309,7 +321,7 @@ export function ProjectClient({
                     )}
 
                     {/* Existing Envs */}
-                    {projectEnvs.map((env: any) => (
+                    {projectEnvs.map((env) => (
                       <button
                         key={env.id}
                         onClick={() =>
@@ -408,7 +420,7 @@ export function ProjectClient({
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-white/5">
-                            {activeEnv.secrets.map((secret: any) => (
+                            {activeEnv.secrets.map((secret) => (
                               <tr
                                 key={secret.id}
                                 className="group hover:bg-white/[0.01]"
@@ -420,7 +432,7 @@ export function ProjectClient({
                                   {maskSecret(secret.value)}
                                 </td>
                                 <td className="px-5 py-4 text-xs text-app-muted italic text-[10px]">
-                                  {dateFormatter.format(secret.createdAt)}
+                                  {dateFormatter.format(new Date(secret.createdAt))}
                                 </td>
                                 <td className="px-5 py-4 text-right">
                                   <form action={actions.deleteSecret}>
@@ -515,7 +527,7 @@ export function ProjectClient({
                             </SubmitButton>
                           </SmartForm>
                           <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                            {activeEnv.apiKeys.map((key: any) => (
+                            {activeEnv.apiKeys.map((key) => (
                               <div
                                 key={key.id}
                                 className="flex items-center justify-between border border-white/5 bg-white/[0.02] p-2 hover:bg-white/[0.04] transition-colors"
@@ -589,7 +601,7 @@ export function ProjectClient({
                         <span className="text-white font-bold">
                           {activeEnvName}
                         </span>{" "}
-                        environment hasn't been initialized for this project
+                        environment hasn&apos;t been initialized for this project
                         yet.
                       </p>
                       <SmartForm

@@ -34,7 +34,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold uppercase tracking-wider text-app-primary/80 mb-4">1. Acceptance of Terms</h2>
               <p className="leading-relaxed">
-                By accessing or using Krypt (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+                By accessing or using Krypt (the &quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
               </p>
             </section>
 
@@ -78,7 +78,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold uppercase tracking-wider text-app-primary/80 mb-4">6. Limitation of Liability</h2>
               <p className="leading-relaxed">
-                Krypt is provided "as is" without any warranties. In no event shall Krypt be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits or data.
+                Krypt is provided &quot;as is&quot; without any warranties. In no event shall Krypt be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits or data.
               </p>
             </section>
 

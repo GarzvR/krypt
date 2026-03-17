@@ -1,18 +1,16 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useFormStatus } from "react-dom";
 
 export function SmartForm({ 
   action, 
   children, 
-  className,
-  placeholder 
+  className 
 }: { 
   action: (formData: FormData) => void; 
   children: React.ReactNode;
   className?: string;
-  placeholder?: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   

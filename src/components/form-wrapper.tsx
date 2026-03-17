@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 export function FormReset({ children }: { children: React.ReactNode }) {
   const formRef = useRef<HTMLFormElement>(null);

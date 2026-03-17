@@ -28,24 +28,18 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 interface Environment {
   id: string;
   name: string;
-  projectId: string;
-  createdAt: Date;
   secrets: {
     id: string;
     key: string;
     value: string;
+    description: string | null;
     createdAt: Date;
   }[];
   apiKeys: {
     id: string;
-    name: string;
+    name: string | null;
     key: string;
   }[];
-  project: {
-    id: string;
-    name: string;
-    slug: string;
-  };
 }
 
 interface Project {

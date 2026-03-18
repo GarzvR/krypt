@@ -118,6 +118,7 @@ export function DashboardSearch() {
                   autoFocus
                   type="text"
                   value={query}
+                  autoComplete="off"
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {

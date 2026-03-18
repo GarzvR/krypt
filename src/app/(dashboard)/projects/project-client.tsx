@@ -238,6 +238,7 @@ export function ProjectClient({
             type="text"
             name="name"
             required
+            autoComplete="off"
             placeholder="Project name"
             className="h-12 border border-app bg-transparent px-4 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
           />
@@ -375,17 +376,20 @@ export function ProjectClient({
                         <input
                           name="key"
                           required
+                          autoComplete="off"
                           placeholder="API_KEY"
                           className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none focus:ring-2 ring-app-primary"
                         />
                         <input
                           name="value"
                           required
+                          autoComplete="off"
                           placeholder="Secret value"
                           className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none focus:ring-2 ring-app-primary"
                         />
                         <input
                           name="description"
+                          autoComplete="off"
                           placeholder="Description"
                           className="h-11 border border-app bg-transparent px-3 text-sm text-app-foreground outline-none focus:ring-2 ring-app-primary"
                         />
@@ -513,6 +517,7 @@ export function ProjectClient({
                             <input
                               name="name"
                               required
+                              autoComplete="off"
                               placeholder="Label (e.g. Vercel)"
                               className="h-10 flex-1 bg-transparent border border-app px-3 text-xs outline-none focus:ring-1 ring-app-primary placeholder:opacity-40"
                             />

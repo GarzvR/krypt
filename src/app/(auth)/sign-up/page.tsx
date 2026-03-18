@@ -41,7 +41,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
             type="email"
             name="email"
             required
-            autoComplete="email"
+            autoComplete="off"
             className="h-12 w-full border border-app bg-transparent px-4 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
             placeholder="you@company.com"
           />
@@ -51,7 +51,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
           name="password"
           required
           minLength={8}
-          autoComplete="new-password"
+          autoComplete="off"
           placeholder="At least 8 characters"
         />
 

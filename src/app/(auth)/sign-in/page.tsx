@@ -49,7 +49,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
             type="email"
             name="email"
             required
-            autoComplete="email"
+            autoComplete="off"
             defaultValue={email}
             className="h-12 w-full border border-app bg-transparent px-4 text-sm text-app-foreground outline-none ring-app-primary placeholder:text-app-muted focus:ring-2"
             placeholder="you@company.com"
@@ -60,7 +60,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
           name="password"
           required
           minLength={8}
-          autoComplete="current-password"
+          autoComplete="off"
           placeholder="Your password"
         />
 

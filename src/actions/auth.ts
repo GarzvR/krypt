@@ -91,7 +91,17 @@ export async function signUpAction(formData: FormData) {
   if (existingUser) {
     if (!existingUser.emailVerifiedAt) {
       try {
-        await issueAndSendEmailVerification(existingUser.id, email);
+        const wasAutoVerified = await issueAndSendEmailVerification(existingUser.id, email);
+        
+        if (wasAutoVerified) {
+          redirect(
+            withNotice(
+              "/sign-in",
+              "Sandbox Mode: Account automatically verified. You can now sign in.",
+              { email },
+            ),
+          );
+        }
       } catch (error) {
         if (isRedirectError(error)) throw error;
         console.error("Resend verification on sign up error:", error);
@@ -128,7 +138,17 @@ export async function signUpAction(formData: FormData) {
       select: { id: true, email: true },
     });
 
-    await issueAndSendEmailVerification(user.id, user.email);
+    const wasAutoVerified = await issueAndSendEmailVerification(user.id, user.email);
+
+    if (wasAutoVerified) {
+      redirect(
+        withNotice(
+          "/sign-in",
+          "Sandbox Mode: Account automatically verified. You can now sign in.",
+          { email },
+        ),
+      );
+    }
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error("Sign up error:", error);
@@ -232,7 +252,17 @@ export async function resendVerificationEmailAction(formData: FormData) {
     });
 
     if (user && !user.emailVerifiedAt) {
-      await issueAndSendEmailVerification(user.id, email);
+      const wasAutoVerified = await issueAndSendEmailVerification(user.id, email);
+      
+      if (wasAutoVerified) {
+        redirect(
+          withNotice(
+            "/sign-in",
+            "Sandbox Mode: Account automatically verified. You can now sign in.",
+            { email },
+          ),
+        );
+      }
     }
   } catch (error) {
     if (isRedirectError(error)) throw error;

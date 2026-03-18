@@ -74,8 +74,19 @@ export async function sendVerificationEmail(email: string, token: string) {
 }
 
 export async function issueAndSendEmailVerification(userId: string, email: string) {
+  if (env.RESEND_FROM_EMAIL === "onboarding@resend.dev") {
+    // Sandbox mode restriction: auto-verify the user to allow testing without valid sender domain
+    console.warn(`[Sandbox Mode] Auto-verifying email ${email} to bypass Resend sandbox restriction.`);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { emailVerifiedAt: new Date() }
+    });
+    return true; // Indicates it was auto-verified
+  }
+
   const token = await createEmailVerificationToken(userId);
   await sendVerificationEmail(email, token);
+  return false;
 }
 
 export async function verifyEmailToken(token: string) {

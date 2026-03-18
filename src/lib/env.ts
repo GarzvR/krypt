@@ -32,8 +32,7 @@ export const env = createEnv({
     APP_URL: optionalUrlString(),
     RESEND_API_KEY: optionalNonEmptyString(),
     RESEND_FROM_EMAIL: optionalNonEmptyString()
-      .default("onboarding@resend.dev")
-      .transform((v) => (v.includes("@getkrypt.dev") ? "onboarding@resend.dev" : v)),
+      .default("onboarding@resend.dev"),
     LEMON_SQUEEZY_API_KEY: optionalNonEmptyString(),
     LEMON_SQUEEZY_STORE_ID: optionalNonEmptyString(),
     LEMON_SQUEEZY_PRO_VARIANT_ID: optionalNonEmptyString(),

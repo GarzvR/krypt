@@ -57,7 +57,7 @@ export async function createProCheckout(input: {
           },
           product_options: {
             redirect_url:
-              input.successUrl ?? "http://localhost:3000/settings?billing=success",
+              input.successUrl ?? "https://getkrypt.dev/settings?billing=success",
           },
         },
         relationships: {

@@ -86,7 +86,7 @@ export function LandingPage({ currentUserEmail }: LandingPageProps) {
           className="flex items-center justify-between border-b border-app/50 py-5"
         >
           <div className="flex items-center gap-10">
-            <img src="/logo.png" alt="Krypt" className="h-8 w-auto" />
+            <img src="/logo.png" alt="Krypt" className="h-12 w-auto" />
 
             <nav className="hidden items-center gap-8 md:flex">
               <a

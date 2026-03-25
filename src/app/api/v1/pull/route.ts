@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       projectSlug: string;
       environmentId: string;
       environmentName: string;
-      secrets: any[];
+      secrets: Array<{ key: string; value: string; description: string | null }>;
       apiKeyId?: string;
     } | null = null;
 

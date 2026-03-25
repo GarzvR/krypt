@@ -248,9 +248,9 @@ export default async function AccountPage() {
             CLI Quick Start
           </h4>
           <p className="text-[10px] text-app-muted">
-            Install globally with{" "}
-            <code>npm install -g github:GarzvR/krypt-cli</code>, then run{" "}
-            <code>krypt init --token=&lt;token&gt;</code>.
+            Install with{" "}
+            <code>npm install -g ./cli</code> (local) or your github repo, then run{" "}
+            <code>krypt login</code>.
           </p>
         </div>
       </footer>

@@ -25,6 +25,7 @@ model User {
   auditLogs                  AuditLog[]
   apiKeys                    ApiKey[]
   emailVerificationTokens    EmailVerificationToken[]
+  personalAccessTokens       PersonalAccessToken[]
 }
 
 model EmailVerificationToken {
@@ -110,4 +111,16 @@ model AuditLog {
 
   @@index([projectId])
   @@index([createdAt])
+}
+
+model PersonalAccessToken {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  name       String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

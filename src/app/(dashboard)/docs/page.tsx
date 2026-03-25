@@ -91,7 +91,7 @@ export default function DocsPage() {
         </h1>
         <div className="mx-auto h-1 w-20 bg-app-primary mb-8" />
         <p className="mx-auto text-xl text-app-muted leading-relaxed max-w-3xl">
-          Krypt CLI is designed for speed and security. Install once, connect your environment-specific token, and pull your secrets with zero friction.
+          Krypt CLI is designed for speed and security. Log in once, link your projects interactively, and pull secrets with zero friction.
         </p>
       </motion.div>
 
@@ -102,7 +102,7 @@ export default function DocsPage() {
           <div className="space-y-8">
             <div className="prose prose-invert max-w-none">
               <p className="text-app-muted leading-relaxed bg-white/[0.02] border-l-2 border-app-primary p-4 mb-6 italic text-sm">
-                Install the CLI globally from the GitHub repo, then use the
+                Install the CLI globally from the GitHub repo or local folder, then use the
                 <code> krypt </code>
                 command anywhere.
               </p>
@@ -118,27 +118,44 @@ export default function DocsPage() {
                   <CodeBlock
                     id="global-install"
                     code="npm install -g github:GarzvR/krypt-cli"
-                    label="Terminal"
+                    label="From GitHub"
                   />
+                  <p className="text-[10px] text-app-muted mt-2">
+                    Or from local folder: <code>npm install -g ./cli</code>
+                  </p>
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                    Step 2: Connect your token
+                    Step 2: Login to your account
                   </h3>
                   <p className="text-xs text-app-muted">
-                    Generate an environment token from Krypt, then save it once.
+                    Sign in with your email and password to authorize your machine.
                   </p>
                   <CodeBlock
-                    id="global-init"
-                    code="krypt init --token=krp_your_environment_token"
+                    id="global-login"
+                    code="krypt login"
                     label="Terminal"
                   />
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                    Step 3: Pull your secrets
+                    Step 3: Link your project
+                  </h3>
+                  <p className="text-xs text-app-muted">
+                    Interactively select your project and environment to link the directory.
+                  </p>
+                  <CodeBlock
+                    id="global-link"
+                    code="krypt link"
+                    label="Terminal"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                    Step 4: Pull your secrets
                   </h3>
                   <p className="text-xs text-app-muted">
                     Verify the token scope, then write the matching env file.
@@ -175,9 +192,7 @@ export default function DocsPage() {
                 </h4>
               </div>
               <p className="text-xs text-app-muted leading-relaxed">
-                Tokens are now generated per environment. A token created for
-                <code>Development</code> cannot be used to pull{" "}
-                <code>Production</code> secrets.
+                Connect once globally. Then link individual project directories to specific environments. No more manual token management.
               </p>
             </div>
 
@@ -227,7 +242,7 @@ export default function DocsPage() {
               </p>
               <CodeBlock
                 id="simple-usage"
-                code={`krypt init --token=krp_your_environment_token\nkrypt pull`}
+                code={`krypt login\nkrypt link\nkrypt pull`}
                 label="Terminal"
               />
             </div>

@@ -20,7 +20,45 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Krypt CLI
+
+Krypt comes with a powerful CLI to manage your secrets directly from your terminal.
+
+### Installation
+
+Since the package is in development, install it from the project root:
+
+```bash
+# From the project root (/Users/edgarvr/project-edgar/startup-project/krypt)
+npm install -g ./krypt/cli
+```
+
+Or if you are inside the `krypt/cli` folder:
+```bash
+npm install -g .
+```
+
+*Note: Once published, users can install it via `npm install -g krypt-cli`.*
+
+### Quick Start
+
+1. **Login:**
+   ```bash
+   krypt login
+   ```
+2. **Link your project:**
+   ```bash
+   krypt link
+   ```
+3. **Pull secrets:**
+   ```bash
+   krypt pull
+   ```
+
+Run `krypt --help` for more information.
+
 ## Learn More
+...
 
 To learn more about Next.js, take a look at the following resources:
 

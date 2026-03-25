@@ -6,6 +6,9 @@
   "bin": {
     "krypt": "krypt.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +16,8 @@
     "krypt",
     "secrets",
     "env",
-    "security"
+    "security",
+    "cli"
   ],
   "author": "GarzvR",
   "license": "MIT"

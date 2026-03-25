@@ -3,6 +3,7 @@ import {
   parseBearerToken,
   touchApiKeyLastUsed,
 } from "@/lib/api-keys";
+import { validatePAT } from "@/lib/auth/pat";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -18,30 +19,38 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Try API Key first
     const apiKey = await getApiKeyContextByToken(token);
-
-    if (!apiKey || !apiKey.user) {
-      return NextResponse.json(
-        { error: "Unauthorized: Invalid token" },
-        { status: 401 },
-      );
+    if (apiKey) {
+      await touchApiKeyLastUsed(apiKey.id);
+      return NextResponse.json({
+        user: apiKey.user.email,
+        tokenScope: "environment",
+        project: {
+          id: apiKey.environment.project.id,
+          name: apiKey.environment.project.name,
+          slug: apiKey.environment.project.slug,
+        },
+        environment: {
+          id: apiKey.environment.id,
+          name: apiKey.environment.name,
+        },
+      });
     }
 
-    await touchApiKeyLastUsed(apiKey.id);
+    // Try Personal Access Token
+    const pat = await validatePAT(token);
+    if (pat) {
+      return NextResponse.json({
+        user: pat.user.email,
+        tokenScope: "user",
+      });
+    }
 
-    return NextResponse.json({
-      user: apiKey.user.email,
-      tokenScope: "environment",
-      project: {
-        id: apiKey.environment.project.id,
-        name: apiKey.environment.project.name,
-        slug: apiKey.environment.project.slug,
-      },
-      environment: {
-        id: apiKey.environment.id,
-        name: apiKey.environment.name,
-      },
-    });
+    return NextResponse.json(
+      { error: "Unauthorized: Invalid token" },
+      { status: 401 },
+    );
   } catch (error) {
     console.error("API Info Error:", error);
     return NextResponse.json(
